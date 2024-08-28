@@ -102,8 +102,28 @@
 			],
 			"palette": [
 				{
-					"color": "#1a416f",
+					"color": "#194b57",
 					"name": "TS Darkblue",
+					"slug": "ts_darkblue"
+				},
+                {
+					"color": "#4881b6",
+					"name": "TS Blue",
+					"slug": "ts_blue"
+				},
+                {
+					"color": "#70b7ac",
+					"name": "TS Light blue",
+					"slug": "ts_lightblue"
+				},
+                {
+					"color": "#b42127",
+					"name": "TS Red",
+					"slug": "ts_red"
+				},
+                {
+					"color": "#f8bd3b",
+					"name": "TS Yellow",
 					"slug": "ts_darkblue"
 				},
 				{
