@@ -52,13 +52,13 @@ body {
 //         border-bottom-color 0.2s ease-in-out;
 // }
 
-// // Header Hero Group
+// Header Hero Group
 
-// .header_hero_group {
-//     display: grid;
-//     grid-template-rows: auto 1fr; 
-//     height: 100vh;
-// }
+.header_hero_group {
+    display: grid;
+    grid-template-rows: auto 1fr; 
+    height: 100vh;
+}
 
 // /* Header */
 
@@ -135,13 +135,13 @@ nav.wp-block-navigation .wp-block-navigation__container {
     }
 }
 
-// // Homepage
+// Homepage
 
-// // Home Cover
+// Home Cover
 
-// wp-block-cover {
-//     margin-block-start: 0;
-// }
+wp-block-cover {
+    margin-block-start: 0;
+}
 
 // // CTA
 

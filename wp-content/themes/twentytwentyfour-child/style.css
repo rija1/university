@@ -11,6 +11,14 @@ body {
   font-family: Raleway;
 }
 
+.header_hero_group {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-rows: auto 1fr;
+      grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+
 nav.wp-block-navigation .wp-block-navigation__container > li {
   padding: 10px 15px 10px 15px;
 }
@@ -72,5 +80,10 @@ nav.wp-block-navigation .wp-block-navigation__container li:nth-child(5) {
 
 nav.wp-block-navigation .wp-block-navigation__container li:nth-child(5):hover {
   background-color: #4881b6;
+}
+
+wp-block-cover {
+  -webkit-margin-before: 0;
+          margin-block-start: 0;
 }
 /*# sourceMappingURL=style.css.map */
