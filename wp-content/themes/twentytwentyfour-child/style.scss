@@ -1,0 +1,225 @@
+// /*
+// Theme Name:   Twenty Twenty Four Child Theme
+// Description:  A Twenty Twenty-Four child theme
+// Author:       Rija
+// Template:     twentytwentyfour
+// Version:      1.0.0
+// Text Domain:  twentytwentyfour
+// */
+
+// // Site colors
+
+$colour_darkblue: #194b57;
+$colour_blue: #4881b6;
+$colour_lightblue: #70b7ac;
+// $colour_lightblue-bg :#70b7ac;
+$colour_red: #b42127;
+$colour_yellow: #f8bd3b;
+
+// /* Title Font Import */
+
+// @font-face {
+//     font-family: "DM-Serif";
+//     src: url("fonts/DMSerifText-Regular.ttf");
+// }
+
+// @font-face {
+//     font-family: "Raleway";
+//     src: url("fonts/Raleway-400.ttf");
+// }
+
+// @font-face {
+//     font-family: "FontAwesome";
+//     src:
+//         // url("fonts/fontawesome-webfont-webfont.woff2") format("woff2"),
+//         // url("fonts/fontawesome-webfont-webfont.woff") format("woff"),
+//         url("fonts/fa-solid-900.ttf") format("truetype");
+//     font-weight: normal;
+//     font-style: normal;
+// }
+
+// /* Body  */
+
+// body {
+//     // background-color: #fff;
+//     color: #2c3333;
+//     font-family: Raleway;
+// }
+
+// a {
+//     transition:
+//         color 0.1s ease-in-out,
+//         border-bottom-color 0.2s ease-in-out;
+// }
+
+// // Header Hero Group
+
+// .header_hero_group {
+//     display: grid;
+//     grid-template-rows: auto 1fr; 
+//     height: 100vh;
+// }
+
+// /* Header */
+
+// header p {
+//     background-color: #fff;
+// }
+
+// body .has-base-background-color {
+//     // background-color: #ffffff !important;
+// }
+
+// // Navigation
+
+// nav.wp-block-navigation .wp-block-navigation__container {
+//     // gap: 5px;
+
+//     > li {
+//         padding: 10px 15px 10px 15px;
+//         a {
+//             &:hover {
+//                 text-decoration: none;
+//             }
+//         }
+//         &:hover {
+//             transition: 1400ms;
+//             border: none;
+//             > a {
+//                 color: #ffffff;
+//             }
+//             button {
+//                 transition: 1400ms;
+//             }
+//         }
+//     }
+
+//     // Targeting the first list item
+//     > li:nth-child(1) {
+//         border-bottom: solid 3px $colour_lightblue;
+//         &:hover {
+//             background-color: $colour_lightblue;
+//         }
+//     }
+
+//     // Targeting the second list item
+//     > li:nth-child(2) {
+//         border-bottom: solid 3px $colour_red;
+//         &:hover {
+//             background-color: $colour_red;
+//         }
+//     }
+
+//     // Assuming there was a typo in the original request and it meant 3rd and 4th items
+//     // Targeting the third list item
+//     > li:nth-child(3) {
+//         border-bottom: solid 3px $colour_yellow;
+//         &:hover {
+//             background-color: $colour_yellow;
+//         }
+//     }
+
+//     // Targeting the fourth list item
+//     li:nth-child(4) {
+//         border-bottom: solid 3px $colour_darkblue;
+//         &:hover {
+//             background-color: $colour_darkblue;
+//         }
+//     }
+
+//     // Targeting the fourth list item
+//     li:nth-child(5) {
+//         border-bottom: solid 3px $colour_blue;
+//         &:hover {
+//             background-color: $colour_blue;
+//         }
+//     }
+// }
+
+// // Homepage
+
+// // Home Cover
+
+// wp-block-cover {
+//     margin-block-start: 0;
+// }
+
+// // CTA
+
+// .home_cta {
+//     position: relative;
+//     h2 {
+//         text-align: center;
+//         font-size: 35px;
+//         &::before {
+//             font-family: "FontAwesome";
+//             font-size: 38px;
+//             content: "";
+//             // content: "\f10d";
+//             padding-right: 30px;
+//         }
+//     }
+//     img {
+//         z-index: -1;
+//     }
+//     .wp-block-cover {
+//         &::before {
+//             content: "";
+//             display: block;
+//             position: absolute;
+//             top: 0;
+//             left: 0;
+//             width: 100%;
+//             height: 100%;
+//             opacity: 0.3;
+//         }
+//     }
+// }
+
+// .home_cta_1 {
+//     &::before {
+//         background-color: $colour_yellow;
+//     }
+//     h2::before {
+//         content: "\f19c";
+//     }
+// }
+
+// .home_cta_2 {
+//     &::before {
+//         background-color: $colour_darkblue; 
+//     }
+//     h2::before {
+//         content: "\f19d";
+//     }
+// }
+
+// .home_cta_3 {
+//     &::before {
+//         background-color: $colour_red; 
+//     }
+//     h2::before {
+//         content: "\f655";
+//     }
+// }
+
+// .home_cta_4 {
+//     &::before {
+//         background-color: $colour_lightblue; 
+//     }
+//     h2::before {
+//         content: "\f1ce";
+//     }
+// }
+
+// // Quote
+
+// .home-quote {
+//     font: 16px Raleway;
+//     line-height: 28px;
+//     text-align: justify;
+// }
+
+// .home p.home-quote-author {
+//     font: 15px Raleway;
+// }
