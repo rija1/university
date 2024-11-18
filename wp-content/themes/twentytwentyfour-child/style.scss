@@ -108,7 +108,7 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     }
 
     // Targeting the fourth list item
-    li:nth-child(4) {
+    > li:nth-child(4) {
         border-bottom: solid 3px $colour_darkblue;
         &:hover {
             background-color: $colour_darkblue;
@@ -116,7 +116,7 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     }
 
     // Targeting the fourth list item
-    li:nth-child(5) {
+    > li:nth-child(5) {
         border-bottom: solid 3px $colour_blue;
         &:hover {
             background-color: $colour_blue;
