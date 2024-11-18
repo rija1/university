@@ -18,6 +18,10 @@ body {
   font-family: Raleway;
 }
 
+:where(.wp-site-blocks *:focus) {
+  outline: none;
+}
+
 .header_hero_group {
   display: -ms-grid;
   display: grid;

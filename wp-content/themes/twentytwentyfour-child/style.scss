@@ -45,6 +45,12 @@ body {
     font-family: Raleway;
 }
 
+:where(.wp-site-blocks *:focus){
+
+    outline: none;
+  
+  }
+
 // a {
 //     transition:
 //         color 0.1s ease-in-out,
