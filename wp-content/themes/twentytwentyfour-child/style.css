@@ -13,11 +13,6 @@ Text Domain:  twentytwentyfour
   font-style: normal;
 }
 
-body {
-  color: #2c3333;
-  font-family: Raleway;
-}
-
 :where(.wp-site-blocks *:focus) {
   outline: none;
 }
