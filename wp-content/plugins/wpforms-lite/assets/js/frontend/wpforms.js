@@ -1,4 +1,4 @@
-/* global wpforms_settings, grecaptcha, hcaptcha, turnstile, wpformsRecaptchaCallback, wpformsRecaptchaV3Execute, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE, WPFormsUtils, JQueryDeferred, JQueryXHR */
+/* global wpforms_settings, grecaptcha, hcaptcha, turnstile, wpformsRecaptchaCallback, wpformsRecaptchaV3Execute, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE, WPFormsUtils, JQueryDeferred, JQueryXHR, WPFormsRepeaterField */
 
 /* eslint-disable no-unused-expressions, no-shadow, no-unused-vars */
 
@@ -104,9 +104,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			$( document ).trigger( 'wpformsReady' );
 
 			$( '.wpforms-smart-phone-field' ).each( function() {
-				const $field = $( this );
-
-				app.fixPhoneFieldSnippets( $field );
+				app.repairSmartPhoneHiddenField( $( this ) );
 			} );
 		},
 
@@ -170,9 +168,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 					honeypotIdAttr = `wpforms-${ formId }-field_${ honeypotFieldId }`,
 					$insertBeforeField = $( `#wpforms-${ formId }-field_${ insertBeforeId }-container`, $form ),
 					inlineStyles = 'position: absolute !important; overflow: hidden !important; display: inline !important; height: 1px !important; width: 1px !important; z-index: -1000 !important; padding: 0 !important;',
+					labelInlineStyles = 'counter-increment: none;',
 					fieldHTML = `
 						<div id="${ honeypotIdAttr }-container" class="wpforms-field wpforms-field-text" data-field-type="text" data-field-id="${ honeypotFieldId }" style="${ inlineStyles }">
-							<label class="wpforms-field-label" for="${ honeypotIdAttr }" aria-hidden="true">${ label }</label>
+							<label class="wpforms-field-label" for="${ honeypotIdAttr }" aria-hidden="true" style="${ labelInlineStyles }">${ label }</label>
 							<input type="text" id="${ honeypotIdAttr }" class="wpforms-field-medium" name="wpforms[fields][${ honeypotFieldId }]" aria-hidden="true" style="visibility: hidden;" tabindex="-1">
 						</div>`;
 
@@ -837,6 +836,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 						};
 					}
 					form.validate( properties );
+					app.loadValidationGroups( form );
 				} );
 			}
 		},
@@ -1193,10 +1193,14 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		 * Fix the Phone field snippets.
 		 *
 		 * @since 1.8.7.1
+		 * @deprecated 1.9.2
 		 *
 		 * @param {jQuery} $field Phone field element.
 		 */
 		fixPhoneFieldSnippets( $field ) {
+			// eslint-disable-next-line no-console
+			console.warn( 'WARNING! Obsolete function called. Function wpforms.fixPhoneFieldSnippets( $field ) has been deprecated, please use the wpforms.repairSmartPhoneHiddenField( $field ) function instead!' );
+
 			$field.siblings( 'input[type="hidden"]' ).each( function() {
 				if ( ! $( this ).attr( 'name' ).includes( 'function' ) ) {
 					return;
@@ -1224,32 +1228,60 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		},
 
 		/**
-		 * Load Smartphone field.
+		 * Compatibility fix with an old intl-tel-input library that may include in other addons.
+		 * Also, for custom snippets that use `options.hiddenInput` to recieve fieldId.
 		 *
-		 * @since 1.5.2
-		 * @since 1.8.9 Added the `$context` parameter.
+		 * @since 1.9.2
 		 *
-		 * @param {jQuery} $context Context to search for smartphone elements.
+		 * @param {jQuery} $field Phone field element.
 		 */
-		loadSmartPhoneField( $context ) { // eslint-disable-line complexity
-			if ( typeof window.intlTelInput === 'undefined' ) {
-				// Only load if a library exists.
+		repairSmartPhoneHiddenField( $field ) {
+			const fieldId = $field.closest( '.wpforms-field-phone' ).data( 'field-id' );
+
+			if ( $( '[name="wpforms[fields][' + fieldId + ']"]' ).length ) {
 				return;
 			}
 
+			const iti = $field.data( 'plugin_intlTelInput' );
+			let fieldValue = $field.val();
+			let inputOptions = {};
+
+			if ( iti ) {
+				inputOptions = iti.d || iti.options || {};
+				fieldValue = iti.getNumber();
+
+				iti.destroy();
+			}
+
+			$field.removeData( 'plugin_intlTelInput' );
+
+			// The field has beautified view. We should use hidden input value before destroying.
+			$field.val( fieldValue );
+
+			app.initSmartPhoneField( $field, inputOptions );
+		},
+
+		/**
+		 * Get a list of default smart phone field options.
+		 *
+		 * @since 1.9.2
+		 *
+		 * @return {Object} List of default options.
+		 */
+		getDefaultSmartPhoneFieldOptions() { // eslint-disable-line complexity
 			const inputOptions = {
 				countrySearch: false,
 				fixDropdownWidth: false,
 				preferredCountries: [ 'us', 'gb' ],
 				countryListAriaLabel: wpforms_settings.country_list_label,
 			};
-			let countryCode;
 
 			// Determine the country by IP if no GDPR restrictions enabled.
 			if ( ! wpforms_settings.gdpr ) {
 				inputOptions.geoIpLookup = app.currentIpToCountry;
 			}
 
+			let countryCode;
 			// Try to kick in an alternative solution if GDPR restrictions are enabled.
 			if ( wpforms_settings.gdpr ) {
 				const lang = app.mapLanguageToIso( this.getFirstBrowserLanguage() );
@@ -1270,6 +1302,25 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			// Set default country.
 			inputOptions.initialCountry = wpforms_settings.gdpr && countryCode ? countryCode.toLowerCase() : 'auto';
 
+			return inputOptions;
+		},
+
+		/**
+		 * Load Smartphone field.
+		 *
+		 * @since 1.5.2
+		 * @since 1.8.9 Added the `$context` parameter.
+		 *
+		 * @param {jQuery} $context Context to search for smartphone elements.
+		 */
+		loadSmartPhoneField( $context ) {
+			if ( typeof window.intlTelInput === 'undefined' ) {
+				// Only load if a library exists.
+				return;
+			}
+
+			app.loadJqueryIntlTelInput();
+
 			$context = $context?.length ? $context : $( document );
 
 			$context.find( '.wpforms-smart-phone-field' ).each( function( i, el ) {
@@ -1280,62 +1331,114 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 					return false;
 				}
 
-				// Hidden input allows to include country code into submitted data.
-				inputOptions.hiddenInput = function( telInputName ) {
-					return {
-						phone: telInputName,
-					};
-				};
-				inputOptions.utilsScript = wpforms_settings.wpforms_plugin_url + 'assets/pro/lib/intl-tel-input/module.intl-tel-input-utils.min.js';
+				app.initSmartPhoneField( $el, {} );
+			} );
+		},
 
-				const iti = window.intlTelInput(
-					$el.get( 0 ),
-					inputOptions
-				);
+		/**
+		 * Backward compatibility jQuery plugin for IntlTelInput library, to support custom snippets.
+		 * e.g., https://wpforms.com/developers/how-to-set-a-default-flag-on-smart-phone-field-with-gdpr/.
+		 *
+		 * @since 1.9.2
+		 */
+		loadJqueryIntlTelInput() {
+			if ( typeof $.fn.intlTelInput !== 'undefined' ) {
+				return;
+			}
 
-				$el.on( 'validate', function() {
-					// Validate the field.
-					return iti.isValidNumber( iti.getNumber() );
-				} );
+			$.fn.extend( {
+				intlTelInput( options ) {
+					const $el = $( this );
 
-				$el.data( 'plugin_intlTelInput', iti );
+					if ( options === undefined || typeof options === 'object' ) {
+						return $el.each( function() {
+							const $item = $( this );
 
-				// Backward compatibility,
-				// make compatible with snippet from
-				// @see: https://wpforms.com/developers/how-to-set-a-default-flag-on-smart-phone-field-with-gdpr/
-				// without a need to change the snippet.
-				$.fn.extend( {
-					intlTelInput( inputOptions ) {
+							if ( ! $item.data( 'plugin_intlTelInput' ) ) {
+								const iti = window.intlTelInput( $item.get( 0 ), options );
+
+								$item.data( 'plugin_intlTelInput', iti );
+							}
+						} );
+					}
+
+					if ( typeof options !== 'string' && options[ 0 ] === '_' ) {
+						return;
+					}
+
+					const methodName = options;
+					let returns = this;
+
+					$el.each( function() {
 						const $el = $( this );
+						const iti = $el.data( 'plugin_intlTelInput' );
 
-						if ( inputOptions === 'destroy' ) {
-							const insta = window.intlTelInputGlobals.getInstance( $el[ 0 ] );
-
-							insta.destroy();
+						if ( typeof iti[ methodName ] !== 'function' ) {
 							return;
 						}
 
-						return window.intlTelInput(
-							$el.get( 0 ),
-							inputOptions
-						);
-					},
-				} );
+						// IntlTelInput library returned only the last applied method instance in v21.0-
+						returns = iti[ methodName ]();
 
-				// For proper validation, we should preserve the name attribute of the input field.
-				// But we need to modify the original input name not to interfere with a hidden input.
-				$el.attr( 'name', 'wpf-temp-' + $el.attr( 'name' ) );
+						if ( options === 'destroy' ) {
+							$el.removeData( 'plugin_intlTelInput' );
+						}
+					} );
 
-				// Add special class to remove name attribute before submitting.
-				// So, only the hidden input value will be submitted.
-				$el.addClass( 'wpforms-input-temp-name' );
+					return returns;
+				},
+			} );
+		},
 
-				// Instantly update a hidden form input.
-				// Validation is done separately, so we shouldn't worry about it.
-				// Previously "blur" only was used, which is broken in case Enter was used to submit the form.
-				$el.on( 'blur input', function() {
-					$el.siblings( 'input[type="hidden"]' ).val( iti.getNumber() );
-				} );
+		/**
+		 * Init smart phone field.
+		 *
+		 * @since 1.9.2
+		 *
+		 * @param {jQuery} $el          Input field.
+		 * @param {Object} inputOptions Options for intlTelInput.
+		 */
+		initSmartPhoneField( $el, inputOptions ) {
+			if ( typeof $el.data( 'plugin_intlTelInput' ) === 'object' ) {
+				// Skip if it was already initialized.
+				return;
+			}
+
+			inputOptions = Object.keys( inputOptions ).length > 0 ? inputOptions : app.getDefaultSmartPhoneFieldOptions();
+
+			const fieldId = $el.closest( '.wpforms-field-phone' ).data( 'field-id' );
+			// Hidden input allows to include country code into submitted data.
+			inputOptions.hiddenInput = function() {
+				return {
+					phone: 'wpforms[fields][' + fieldId + ']',
+				};
+			};
+			inputOptions.utilsScript = wpforms_settings.wpforms_plugin_url + 'assets/pro/lib/intl-tel-input/module.intl-tel-input-utils.min.js';
+
+			const iti = window.intlTelInput( $el.get( 0 ), inputOptions );
+
+			$el.on( 'validate', function() {
+				// Validate the field.
+				return iti.isValidNumber( iti.getNumber() );
+			} );
+
+			$el.data( 'plugin_intlTelInput', iti );
+
+			// For proper validation, we should preserve the name attribute of the input field.
+			// But we need to modify the original input name not to interfere with a hidden input.
+			$el.attr( 'name', 'wpf-temp-wpforms[fields][' + fieldId + ']' );
+
+			// Add special class to remove name attribute before submitting.
+			// So, only the hidden input value will be submitted.
+			$el.addClass( 'wpforms-input-temp-name' );
+
+			// Instantly update a hidden form input.
+			// Validation is done separately, so we shouldn't worry about it.
+			// Previously "blur" only was used, which is broken in case Enter was used to submit the form.
+			$el.on( 'blur input', function() {
+				const iti = $el.data( 'plugin_intlTelInput' );
+
+				$el.siblings( 'input[type="hidden"]' ).val( iti.getNumber() );
 			} );
 		},
 
@@ -1345,9 +1448,15 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		 * @since 1.8.9
 		 */
 		bindSmartPhoneField() {
-			// Update hidden input of the `Smart` phone field to be sure the latest value will be submitted.
 			$( '.wpforms-form' ).on( 'wpformsBeforeFormSubmit', function() {
-				$( this ).find( '.wpforms-smart-phone-field' ).trigger( 'input' );
+				const $smartPhoneFields = $( this ).find( '.wpforms-smart-phone-field' );
+
+				$smartPhoneFields.each( function() {
+					app.repairSmartPhoneHiddenField( $( this ) );
+				} );
+
+				// Update hidden input of the `Smart` phone field to be sure the latest value will be submitted.
+				$smartPhoneFields.trigger( 'input' );
 			} );
 		},
 
@@ -1521,6 +1630,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 						if ( self.getValue( true ).length ) {
 							$input.removeAttr( 'placeholder' );
 						}
+
+						$input.css( 'width', '1ch' );
 					}
 
 					// On change event.
@@ -1651,11 +1762,6 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			// Payments: Update Total field(s) when conditionals are processed.
 			$document.on( 'wpformsProcessConditionals', function( e, el ) {
 				app.amountTotal( el, true );
-			} );
-
-			// Order Summary: Update field when conditionals are processed.
-			$document.on( 'wpformsProcessConditionalsField', function( e, formID, fieldID ) {
-				app.updateOrderSummaryItems( $( `#wpforms-form-${ formID }` ), $( `#wpforms-${ formID }-field_${ fieldID }` ), '' );
 			} );
 
 			// Rating field: hover effect.
@@ -2003,7 +2109,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		 */
 		maybeSetStartTime( $form ) {
 			if ( ! $form.data( 'start_timestamp' ) ) {
-				$form.data( 'start_timestamp', Date.now() );
+				$form.data( 'start_timestamp', app.getTimestampSec() );
 			}
 		},
 
@@ -2362,10 +2468,22 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 				app.optinMonsterRecaptchaReset( event.detail.Campaign.data.id );
 			} );
 
+			document.addEventListener( 'om.Campaign.afterShow', function( event ) {
+				// Init Repeater fields.
+				if ( 'undefined' !== typeof WPFormsRepeaterField ) {
+					WPFormsRepeaterField.ready();
+				}
+			} );
+
 			// OM Legacy.
 			$( document ).on( 'OptinMonsterOnShow', function( event, data, object ) {
 				app.ready();
 				app.optinMonsterRecaptchaReset( data.optin );
+
+				// Init Repeater fields.
+				if ( 'undefined' !== typeof WPFormsRepeaterField ) {
+					WPFormsRepeaterField.ready();
+				}
 			} );
 		},
 
@@ -2418,9 +2536,15 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		amountTotal( el, validate ) {
 			validate = validate || false;
 
-			const $form = $( el ).closest( '.wpforms-form' ),
-				total = app.amountTotalCalc( $form ),
-				totalFormattedSymbol = app.amountFormatSymbol( total );
+			const $el = $( el ),
+				$form = $el.closest( '.wpforms-form' ),
+				total = app.amountTotalCalc( $form );
+
+			if ( ! app.allowAmountTotalCalc( $form, $el, total ) ) {
+				return;
+			}
+
+			const totalFormattedSymbol = app.amountFormatSymbol( total );
 
 			$form.find( '.wpforms-payment-total' ).each( function() {
 				if ( 'hidden' === $( this ).attr( 'type' ) || 'text' === $( this ).attr( 'type' ) ) {
@@ -2433,7 +2557,38 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 				}
 			} );
 
-			app.updateOrderSummaryItems( $form, $( el ), totalFormattedSymbol );
+			app.updateOrderSummaryItems( $form, $el, totalFormattedSymbol );
+		},
+
+		/**
+		 * Check if the total amount calculation is allowed.
+		 * Cache total amount to avoid multiple triggers.
+		 *
+		 * @since 1.9.2
+		 *
+		 * @param {jQuery} $form Form object.
+		 * @param {jQuery} $el   Payment field object.
+		 * @param {number} total Total amount.
+		 *
+		 * @return {boolean} True if the total amount calculation is allowed, false otherwise.
+		 */
+		allowAmountTotalCalc( $form, $el, total ) {
+			const formId = $form.data( 'formid' );
+
+			if ( app.getCache( formId, 'amountTotal' ) !== total ) {
+				app.updateCache( formId, 'amountTotal', total );
+
+				return true;
+			}
+
+			const type = $el.prop( 'type' );
+
+			// Force re-calculation for choices and dropdown fields.
+			if ( type === 'radio' || type === 'select-one' ) {
+				return true;
+			}
+
+			return false;
 		},
 
 		/**
@@ -2453,17 +2608,45 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 					$summary.find( '.wpforms-order-summary-preview-total .wpforms-order-summary-item-price' ).text( total );
 				}
 
-				if ( $paymentField.hasClass( 'wpforms-payment-total' ) ) {
-					// Update each payment field price in case it was changed while total calculation.
-					$form.find( '.wpforms-payment-price' ).each( function() {
-						app.updateOrderSummaryItem( $( this ), $summary );
-					} );
-
-					return;
-				}
-
-				app.updateOrderSummaryItem( $paymentField, $summary );
+				$form.find( '.wpforms-payment-price' ).each( function() {
+					app.updateOrderSummaryItem( $( this ), $summary );
+				} );
 			} );
+		},
+
+		/**
+		 * Update value in cache.
+		 *
+		 * @since 1.9.2
+		 *
+		 * @param {string} formId Form ID.
+		 * @param {string} key    Cache key.
+		 * @param {any}    value  Cache value.
+		 */
+		updateCache( formId, key, value ) {
+			app.cache[ formId ] = app.cache[ formId ] || {};
+			app.cache[ formId ][ key ] = value;
+		},
+
+		/**
+		 * Get a value from the cache.
+		 *
+		 * @since 1.9.2
+		 *
+		 * @param {string} formId Form ID.
+		 * @param {string} key    Cache key.
+		 *
+		 * @return {any|boolean} Cache value or false if not found.
+		 */
+		getCache( formId, key ) {
+			if (
+				! Object.prototype.hasOwnProperty.call( app.cache, formId ) ||
+				! Object.prototype.hasOwnProperty.call( app.cache[ formId ], key )
+			) {
+				return false;
+			}
+
+			return app.cache[ formId ][ key ];
 		},
 
 		/**
@@ -2482,27 +2665,25 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 
 			const $field = $paymentField.closest( '.wpforms-field' ),
 				fieldId = $field.data( 'field-id' ),
-				type = $paymentField.prop( 'type' );
+				type = $paymentField.prop( 'type' ),
+				isFieldVisible = $field.css( 'display' ) === 'block';
 
-			if ( type === 'checkbox' ) {
-				$summary.find( `tr[data-field="${ fieldId }"][data-choice="${ $paymentField.val() }"]` ).toggle( $paymentField.is( ':checked' ) );
-			} else if ( type === 'radio' || type === 'select-one' ) {
+			if ( type === 'checkbox' || type === 'radio' || type === 'select-one' ) {
 				// Show only selected items.
 				$summary.find( `tr[data-field="${ fieldId }"]` ).each( function() {
 					const choiceID = $( this ).data( 'choice' );
+					const isChoiceChecked = type === 'select-one'
+						? choiceID === parseInt( $field.find( 'select' ).val(), 10 )
+						: $field.find( `input[value="${ choiceID }"]` ).is( ':checked' );
 
-					if ( type === 'radio' ) {
-						$( this ).toggle( $field.find( `input[value="${ choiceID }"]` ).is( ':checked' ) );
-					} else {
-						$( this ).toggle( choiceID === parseInt( $field.find( 'select' ).val(), 10 ) );
-					}
+					$( this ).toggle( isFieldVisible && isChoiceChecked );
 				} );
 			} else {
 				const $item = $summary.find( `tr[data-field="${ fieldId }"]` ),
 					amount = $paymentField.val();
 
-				$item.find( '.wpforms-order-summary-item-price' ).text( app.amountFormatSymbol( amount ) );
-				$item.toggle( $field.css( 'display' ) === 'block' );
+				$item.find( '.wpforms-order-summary-item-price' ).text( app.amountFormatSymbol( app.amountSanitize( amount ) ) );
+				$item.toggle( isFieldVisible );
 			}
 
 			if ( ! $field.hasClass( 'wpforms-payment-quantities-enabled' ) ) {
@@ -2705,7 +2886,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		amountSanitize( amount ) {
 			const currency = app.getCurrency();
 
-			amount = amount.toString().replace( /[^0-9.,]/g, '' );
+			// Convert to string, remove a currency symbol, and allow only numbers, dots, and commas.
+			amount = amount.toString().replace( currency.symbol, '' ).replace( /[^0-9.,]/g, '' );
 
 			if ( currency.decimal_sep === ',' ) {
 				if ( currency.thousands_sep === '.' && amount.indexOf( currency.thousands_sep ) !== -1 ) {
@@ -2717,6 +2899,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			} else if ( currency.thousands_sep === ',' && ( amount.indexOf( currency.thousands_sep ) !== -1 ) ) {
 				amount = amount.replace( new RegExp( '\\' + currency.thousands_sep, 'g' ), '' );
 			}
+
 			return app.numberFormat( amount, currency.decimals, '.', '' );
 		},
 
@@ -3087,7 +3270,6 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		 * @param {Function} callback Executes once the fetch is completed.
 		 */
 		currentIpToCountry( callback ) {
-
 			if ( wpforms_settings.country ) {
 				callback( wpforms_settings.country );
 				return;
@@ -3196,7 +3378,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			}
 
 			$form.append( '<input type="hidden" name="start_timestamp" value="' + $form.data( 'start_timestamp' ) + '">' );
-			$form.append( '<input type="hidden" name="end_timestamp" value="' + Date.now() + '">' );
+			$form.append( '<input type="hidden" name="end_timestamp" value="' + app.getTimestampSec() + '">' );
 
 			$form.get( 0 ).submit();
 		},
@@ -3403,9 +3585,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			$.each( errors, function( type, html ) {
 				switch ( type ) {
 					case 'header':
+					case 'header_styled':
 						handleHeaderError( html );
 						break;
 					case 'footer':
+					case 'footer_styled':
 						handleFooterError( html );
 						break;
 					case 'recaptcha':
@@ -3542,7 +3726,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 
 			formData.append( 'action', 'wpforms_submit' );
 			formData.append( 'start_timestamp', $form.data( 'start_timestamp' ) );
-			formData.append( 'end_timestamp', Date.now() );
+			formData.append( 'end_timestamp', app.getTimestampSec() );
 
 			const args = {
 				type       : 'post',
@@ -3580,7 +3764,15 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 				}
 
 				if ( json.data.redirect_url ) {
+					const newTab = json.data.new_tab || false;
 					$form.trigger( 'wpformsAjaxSubmitBeforeRedirect', json );
+
+					if ( newTab ) {
+						window.open( json.data.redirect_url, '_blank' );
+						location.reload();
+						return;
+					}
+
 					window.location = json.data.redirect_url;
 					return;
 				}
@@ -3866,6 +4058,76 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 					} );
 				}
 			};
+		},
+
+		/**
+		 * We need separate method for loading validation groups
+		 * because we may dynamically extend them.
+		 *
+		 * @since 1.9.2.3
+		 *
+		 * @param {jQuery} $context Form element or some container inside specific form.
+		 */
+		loadValidationGroups( $context ) {
+			const validator = $context.closest( '.wpforms-form' ).data( 'validator' );
+
+			if ( ! validator ) {
+				return;
+			}
+
+			$.extend( validator.groups, app.getDateTimeValidationGroups( $context ) );
+		},
+
+		/**
+		 * Return validation groups for Date / Time field with
+		 * dropdown and there should only one error message for whole field.
+		 *
+		 * @since 1.9.2.3
+		 *
+		 * @param {jQuery} $context Container to search for Date/Time fields.
+		 *
+		 * @return {Object} Object with validation groups, e.g. {
+		 * "wpforms[fields][1][date][m]": "wpforms-198-field_1",
+		 * "wpforms[fields][1][date][d]": "wpforms-198-field_1"
+		 * "wpforms[fields][1][date][y]": "wpforms-198-field_1",
+		 * ...
+		 * }
+		 */
+		getDateTimeValidationGroups( $context ) {
+			const groups = {};
+
+			// Create groups for the Date / Time field.
+			$context.find( '.wpforms-field.wpforms-field-date-time' ).each( function() {
+				const $field = $( this );
+
+				// Bail out if the date dropdown is NOT used for this field.
+				if ( ! $field.find( '.wpforms-field-date-dropdown-wrap' ).length ) {
+					return;
+				}
+
+				// e.g. wpforms-198-field_1
+				const groupName = $field.attr( 'id' ).replace( '-container', '' );
+
+				$.each( [ 'month', 'day', 'year' ], function( i, subfield ) {
+					const $subfield = $( `#${ groupName }-${ subfield }` );
+					const subFieldName = $subfield.attr( 'name' );
+
+					groups[ subFieldName ] = groupName;
+				} );
+			} );
+
+			return groups;
+		},
+
+		/**
+		 * Retrieve current timestamp in seconds.
+		 *
+		 * @since 1.9.2.3
+		 *
+		 * @return {number} Current timestamp in seconds.
+		 */
+		getTimestampSec() {
+			return Math.floor( Date.now() / 1000 );
 		},
 	};
 

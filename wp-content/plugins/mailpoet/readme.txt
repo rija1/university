@@ -1,9 +1,9 @@
 === MailPoet - Newsletters, Email Marketing, and Automation ===
 Contributors: mailpoet, woocommerce, automattic
 Tags: email marketing, post notification, woocommerce emails, email automation, newsletter
-Requires at least: 6.5
-Tested up to: 6.6
-Stable tag: 5.0.2
+Requires at least: 6.6
+Tested up to: 6.7
+Stable tag: 5.4.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -18,7 +18,7 @@ Our newsletter builder integrates perfectly with WordPress so any website owner 
 
 Schedule your newsletters, send them right away, or set up new blog post notifications to send automatically, in just a few clicks.
 
-Trusted by 700,000 WordPress websites since 2011.
+Trusted by 600,000 WordPress websites since 2011.
 
 **With a free plan to get started, and scaling paid plans with enhanced functionality available, MailPoet is an email marketing solution suitable for both beginners and proficient email marketers.**
 
@@ -230,9 +230,8 @@ Check our [Knowledge Base](https://kb.mailpoet.com) or contact us through our [s
 
 == Changelog ==
 
-= 5.0.2 - 2024-08-26 =
-* Added: Ukrainian translations;
-* Improved: error messages in automations;
-* Changed: human and machine opens are merged by default, old behavior can be restored in settings.
+= 5.4.2 - 2024-12-02 =
+* Improved: stability of post notification scheduling;
+* Changed: minimum required WordPress version to 6.6 and WooCommerce to 9.3.
 
 [See the changelog for all versions.](https://github.com/mailpoet/mailpoet/blob/trunk/mailpoet/CHANGELOG.md)

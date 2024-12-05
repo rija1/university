@@ -3,9 +3,13 @@ let setDefaultSetting = true;
 const regionSettings = data.default_settings || [];
 const waitForTime = data.wait_for_update;
 
-window.dataLayer = window.dataLayer || [];
-function gtag() {
-    dataLayer.push(arguments);
+const dataLayerName =
+  window.ckySettings && window.ckySettings.dataLayerName
+    ? window.ckySettings.dataLayerName
+    : "dataLayer";
+ window[dataLayerName] = window[dataLayerName] || [];
+ function gtag() {
+  window[dataLayerName].push(arguments);
 }
 
 function setConsentInitStates(consentData) {

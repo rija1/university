@@ -380,6 +380,12 @@ class Api extends Rest_Controller {
 	 * @return stdClass
 	 */
 	public function prepare_item_for_database( $request ) {
+		$clear = $request->get_param('clear');
+		if ( is_null( $clear ) ) {
+			$clear = true;
+		} else {
+			$clear = filter_var( $clear, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
+		}
 		$object     = new Settings();
 		$data       = $object->get();
 		$schema     = $this->get_item_schema();
@@ -398,7 +404,7 @@ class Api extends Rest_Controller {
 				$data[ $key ] = $value;
 			}
 		}
-		$object->update( $data );
+		$object->update( $data, $clear );
 		return $object->get();
 	}
 

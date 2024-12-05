@@ -234,11 +234,11 @@ const wpf = {
 	 * @param {Array|boolean|undefined} allowedFields           Allowed fields.
 	 * @param {boolean|undefined}       useCache                Use cache.
 	 * @param {boolean|undefined}       isAllowedRepeaterFields Is repeater fields allowed?
-	 * @param {Object|undefined}         fieldsToExclude         Fields to exclude.
+	 * @param {Object|undefined}        fieldsToExclude         Fields to exclude.
 	 *
 	 * @return {Object} Fields.
 	 */
-	getFields( allowedFields, useCache, isAllowedRepeaterFields, fieldsToExclude ) { // eslint-disable-line complexity, max-lines-per-function
+	getFields( allowedFields = undefined, useCache = undefined, isAllowedRepeaterFields = undefined, fieldsToExclude = undefined ) { // eslint-disable-line complexity, max-lines-per-function
 		useCache = useCache || false;
 
 		let fields;
@@ -326,7 +326,19 @@ const wpf = {
 			return false;
 		}
 
-		return fields;
+		const orderedFields = [];
+
+		for ( const fieldKey in wpf.orders.fields ) {
+			const fieldId = wpf.orders.fields[ fieldKey ];
+
+			if ( ! fields[ fieldId ] ) {
+				continue;
+			}
+
+			orderedFields.push( fields[ fieldId ] );
+		}
+
+		return Object.assign( {}, orderedFields );
 	},
 
 	/**
@@ -377,6 +389,10 @@ const wpf = {
 	getField( id ) {
 		const field = wpf.formObject( '#wpforms-field-option-' + id );
 
+		if ( ! Object.keys( field ).length ) {
+			return {};
+		}
+
 		return field.fields[ Object.keys( field.fields )[ 0 ] ];
 	},
 
@@ -388,7 +404,7 @@ const wpf = {
 	 * @param {string|Element} option jQuery object, or DOM element selector.
 	 * @param {boolean}        unload True if you need to unload spinner, and vice versa.
 	 */
-	fieldOptionLoading( option, unload ) {
+	fieldOptionLoading( option, unload = undefined ) {
 		const $option = jQuery( option ),
 			$label = $option.find( 'label' ),
 			spinner = '<i class="wpforms-loading-spinner wpforms-loading-inline"></i>';
@@ -551,8 +567,8 @@ const wpf = {
 	 * @return {string} Sanitized amount.
 	 */
 	amountSanitize( amount ) { // eslint-disable-line complexity
-		// Convert to string and allow only numbers, dots, and commas.
-		amount = String( amount ).replace( /[^0-9.,]/g, '' );
+		// Convert to string, remove a currency symbol, and allow only numbers, dots, and commas.
+		amount = String( amount ).replace( wpforms_builder.currency_symbol, '' ).replace( /[^0-9.,]/g, '' );
 
 		if ( wpforms_builder.currency_decimal === ',' ) {
 			if ( wpforms_builder.currency_thousands === '.' && amount.indexOf( wpforms_builder.currency_thousands ) !== -1 ) {
@@ -722,7 +738,7 @@ const wpf = {
 	 * @return {boolean} True if debug mode is enabled.
 	 */
 	isDebug() {
-		return ( ( window.location.hash && '#wpformsdebug' === window.location.hash ) || wpforms_builder.debug );
+		return ( ( window.location.hash && '#wpformsdebug' === window.location.hash ) || window.wpforms_builder?.debug );
 	},
 
 	/**
@@ -828,22 +844,33 @@ const wpf = {
 	 * Initialize WPForms admin area tooltips.
 	 *
 	 * @since 1.4.8
+	 * @since 1.6.5 Introduced optional $scope parameter.
+	 *
+	 * @param {jQuery|HTMLElement|null} $scope Searching scope.
 	 */
-	initTooltips() {
+	initTooltips( $scope = null ) {
 		if ( typeof jQuery.fn.tooltipster === 'undefined' ) {
 			return;
 		}
 
 		const isRTL = jQuery( 'body' ).hasClass( 'rtl' );
+		const position = isRTL ? 'left' : 'right';
 
-		jQuery( '.wpforms-help-tooltip' ).tooltipster( {
-			contentAsHTML: true,
-			position: isRTL ? 'left' : 'right',
-			maxWidth: 300,
-			multiple: true,
-			interactive: true,
-			debug: false,
-			IEmin: 11,
+		const $tooltips = ! $scope ? jQuery( '.wpforms-help-tooltip' ) : jQuery( $scope ).find( '.wpforms-help-tooltip' );
+
+		$tooltips.each( function() {
+			const $this = jQuery( this );
+
+			$this.tooltipster( {
+				contentAsHTML: true,
+				position: $this.data( 'tooltip-position' ) || position,
+				maxWidth: 300,
+				multiple: true,
+				interactive: true,
+				debug: false,
+				IEmin: 11,
+				zIndex: 99999999,
+			} );
 		} );
 	},
 

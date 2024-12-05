@@ -188,6 +188,7 @@ function wpforms_sanitize_richtext_field( $value ) {
  * Escaping for Rich Text field values.
  *
  * @since 1.7.0
+ * @since 1.9.1 Removed new lines after adding paragraphs and breaks tags.
  *
  * @param string $value Text to escape.
  *
@@ -195,7 +196,9 @@ function wpforms_sanitize_richtext_field( $value ) {
  */
 function wpforms_esc_richtext_field( $value ) {
 
-	return wpautop( wpforms_sanitize_richtext_field( $value ) );
+	$value = wpautop( wpforms_sanitize_richtext_field( $value ) );
+
+	return trim( str_replace( [ "\r\n", "\r", "\n" ], '', $value ) );
 }
 
 /**
@@ -241,6 +244,7 @@ function wpforms_get_allowed_html_tags_for_richtext_field() {
 			'table',
 			'thead',
 			'tbody',
+			'tfoot',
 			'th',
 			'tr',
 			'td',
@@ -251,10 +255,11 @@ function wpforms_get_allowed_html_tags_for_richtext_field() {
 			'ins',
 			'figure',
 			'figcaption',
+			'caption',
 			'div',
 		],
 		array_fill_keys(
-			[ 'align', 'class', 'id', 'style', 'src', 'rel', 'alt', 'href', 'target', 'width', 'height', 'title', 'cite', 'start', 'reversed', 'datetime' ],
+			[ 'align', 'class', 'id', 'style', 'src', 'rel', 'alt', 'href', 'target', 'width', 'height', 'title', 'cite', 'start', 'reversed', 'datetime', 'scope', 'colspan', 'rowspan' ],
 			[]
 		)
 	);
@@ -482,4 +487,27 @@ function wpforms_esc_unselected_choices( $formatted_field ) {
 	$allowed_html['label'] = [];
 
 	return wp_kses( $formatted_field, $allowed_html );
+}
+
+/**
+ * Decode HTML entities in a string.
+ * Do it cycle to decode all possible entities, including cases like `&amp;lt;`.
+ *
+ * @since 1.9.2.3
+ *
+ * @param string      $html     HTML.
+ * @param int         $flags    Flags.
+ * @param string|null $encoding Encoding.
+ *
+ * @return string
+ * @noinspection PhpMissingParamTypeInspection
+ */
+function wpforms_html_entity_decode_deep( string $html, int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, $encoding = null ): string {
+
+	do {
+		$previous_html = $html;
+		$html          = html_entity_decode( $html, $flags, $encoding );
+	} while ( $html !== $previous_html );
+
+	return $html;
 }

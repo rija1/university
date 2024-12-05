@@ -4,6 +4,7 @@
 use \WPForms\Forms\Fields\Base\Frontend as FrontendBase;
 use WPForms\Forms\Fields\Helpers\RequirementsAlerts;
 use WPForms\Forms\IconChoices;
+use WPForms\Integrations\AI\Helpers as AIHelpers;
 
 /**
  * Base field template.
@@ -672,7 +673,7 @@ abstract class WPForms_Field {
 		 */
 		// Do not populate if there are errors for that field.
 		/*
-		$errors = wpforms()->get( 'process' )->errors;
+		$errors = wpforms()->obj( 'process' )->errors;
 		if ( ! empty( $errors[ $this->form_data['id'] ][ $field['id'] ] ) ) {
 			$allowed = false;
 		}
@@ -977,6 +978,19 @@ abstract class WPForms_Field {
 
 				$output = $this->field_element( 'text', $field, $args, $echo );
 				break;
+
+			// Button.
+			case 'button':
+				$class .= ' wpforms-btn';
+				$output = sprintf(
+					'<button type="button" class="%1$s" id="wpforms-field-option-%2$d-%3$s" %4$s>%5$s</button>',
+					$class,
+					$id,
+					$slug,
+					$attrs,
+					$args['value']
+				);
+				break;
 		}
 
 		if ( ! $echo ) {
@@ -1257,6 +1271,10 @@ abstract class WPForms_Field {
 
 				if ( ! empty( $field['multiple'] ) ) {
 					$field_type = 'checkbox';
+				}
+
+				if ( ! AIHelpers::is_disabled() ) {
+					$class[] = 'wpforms-ai-choices';
 				}
 
 				if ( ! empty( $field['show_values'] ) ) {
@@ -1720,7 +1738,7 @@ abstract class WPForms_Field {
 					false
 				);
 
-				$raw_icon_sizes = wpforms()->get( 'icon_choices' )->get_icon_sizes();
+				$raw_icon_sizes = wpforms()->obj( 'icon_choices' )->get_icon_sizes();
 				$icon_sizes     = [];
 
 				foreach ( $raw_icon_sizes as $key => $data ) {
@@ -2367,6 +2385,20 @@ abstract class WPForms_Field {
 					);
 				}
 				break;
+
+			default:
+				/**
+				 * Filters the field preview option output.
+				 *
+				 * @since 1.9.1
+				 *
+				 * @param string $output Field option output.
+				 * @param array  $field  Field data and settings.
+				 * @param array  $args   Field preview arguments.
+				 * @param object $this   WPForms_Field object.
+				 */
+				$output = (string) apply_filters( "wpforms_field_option_{$option}", $output, $field, $args, $this );
+				break;
 		}
 
 		if ( ! $echo ) {
@@ -2629,7 +2661,7 @@ abstract class WPForms_Field {
 						);
 
 						$label  = $this->get_choices_label( $value['label'] ?? '', $key + 1, $field );
-						$label .= ! empty( $field['show_price_after_labels'] ) && isset( $value['value'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $value['value'] ), true ) : '';
+						$label .= ! empty( $field['show_price_after_labels'] ) && isset( $value['value'] ) ? $this->get_price_after_label( $value['value'] ) : '';
 
 						if ( $with_images ) {
 
@@ -2779,7 +2811,7 @@ abstract class WPForms_Field {
 		// Grab field data.
 		$field_args        = ! empty( $_POST['defaults'] ) && is_array( $_POST['defaults'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['defaults'] ) ) : [];
 		$field_type        = sanitize_key( $_POST['type'] );
-		$field_id          = wpforms()->get( 'form' )->next_field_id( absint( $_POST['id'] ) );
+		$field_id          = wpforms()->obj( 'form' )->next_field_id( absint( $_POST['id'] ) );
 		$field             = [
 			'id'          => $field_id,
 			'type'        => $field_type,
@@ -3037,15 +3069,15 @@ abstract class WPForms_Field {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int   $field_id     Field ID.
-	 * @param mixed $field_submit Submitted field value (raw data).
-	 * @param array $form_data    Form data and settings.
+	 * @param string|int $field_id     Field ID as a numeric string.
+	 * @param mixed      $field_submit Submitted field value (raw data).
+	 * @param array      $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
 
 		// Basic required check - If field is marked as required, check for entry data.
 		if ( ! empty( $form_data['fields'][ $field_id ]['required'] ) && empty( $field_submit ) && '0' !== (string) $field_submit ) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
 		}
 	}
 
@@ -3070,7 +3102,7 @@ abstract class WPForms_Field {
 		// Sanitize but keep line breaks.
 		$value = wpforms_sanitize_textarea_field( $field_submit );
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		wpforms()->obj( 'process' )->fields[ $field_id ] = [
 			'name'  => $name,
 			'value' => $value,
 			'id'    => wpforms_validate_field_id( $field_id ),
@@ -3260,7 +3292,7 @@ abstract class WPForms_Field {
 	 */
 	protected function enqueue_choicesjs_once( $forms ) {
 
-		if ( wpforms()->get( 'frontend' )->is_choicesjs_enqueued ) {
+		if ( wpforms()->obj( 'frontend' )->is_choicesjs_enqueued ) {
 			return;
 		}
 
@@ -3305,7 +3337,7 @@ abstract class WPForms_Field {
 			$config
 		);
 
-		wpforms()->get( 'frontend' )->is_choicesjs_enqueued = true;
+		wpforms()->obj( 'frontend' )->is_choicesjs_enqueued = true;
 	}
 
 	/**
@@ -3693,5 +3725,19 @@ abstract class WPForms_Field {
 	protected function load_script_in_footer(): bool {
 
 		return ! wpforms_is_frontend_js_header_force_load();
+	}
+
+	/**
+	 * Get formatted price after label.
+	 *
+	 * @since 1.9.2
+	 *
+	 * @param float $amount Amount.
+	 *
+	 * @return string
+	 */
+	protected function get_price_after_label( $amount ): string {
+
+		return sprintf( ' - <span class="wpforms-currency-symbol">%s</span>', wpforms_format_amount( wpforms_sanitize_amount( $amount ), true ) );
 	}
 }

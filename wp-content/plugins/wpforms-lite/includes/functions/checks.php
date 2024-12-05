@@ -285,10 +285,13 @@ function wpforms_is_rest() { // phpcs:ignore Generic.Metrics.CyclomaticComplexit
  * Determine if the request is WPForms AJAX.
  *
  * @since 1.8.0
+ * @since 1.9.1 Added an optional parameter to check for a specific action.
+ *
+ * @param string $action Certain AJAX action to check. Optional. Default is empty.
  *
  * @return bool
  */
-function wpforms_is_ajax(): bool {
+function wpforms_is_ajax( string $action = '' ): bool {
 
 	if ( ! wp_doing_ajax() ) {
 		return false;
@@ -301,9 +304,14 @@ function wpforms_is_ajax(): bool {
 	}
 
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$action = isset( $_REQUEST['action'] ) ? sanitize_key( $_REQUEST['action'] ) : '';
+	$request_action    = isset( $_REQUEST['action'] ) ? sanitize_key( $_REQUEST['action'] ) : '';
+	$is_wpforms_action = strpos( $request_action, 'wpforms_' ) === 0;
 
-	return strpos( $action, 'wpforms_' ) === 0;
+	if ( empty( $action ) ) {
+		return $is_wpforms_action;
+	}
+
+	return $is_wpforms_action && $action === $request_action;
 }
 
 /**
@@ -408,6 +416,25 @@ function wpforms_is_gutenberg_active(): bool {
 	}
 
 	return true;
+}
+
+/**
+ * Check if website support Divi Builder.
+ *
+ * @since 1.9.2.3
+ *
+ * @return bool True if Divi builder plugin or Divi or Extra theme is active.
+ */
+function wpforms_is_divi_active(): bool {
+
+	if ( function_exists( 'et_divi_builder_init_plugin' ) ) {
+		return true;
+	}
+
+	$allow_themes = [ 'Divi', 'Extra' ];
+	$theme_name   = get_template();
+
+	return in_array( $theme_name, $allow_themes, true );
 }
 
 /**

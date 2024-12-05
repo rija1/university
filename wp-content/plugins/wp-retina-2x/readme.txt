@@ -3,9 +3,9 @@ Contributors: TigrouMeow
 Tags: retina, images, replace, thumbnail, regenerate
 Donate link: https://www.patreon.com/meowapps
 Requires at least: 6.0
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 6.6.3
+Stable tag: 6.6.6
 
 Optimize your images effortlessly. Replace, regenerate, resize, improve, transform, and achieve perfect images for your site.
 
@@ -49,6 +49,18 @@ The Pro version adds support for Retina for full-size, support for lazy-loading 
 3. Check if it works! - if it doesn't, read the FAQ, the tutorial, and check the forums.
 
 == Changelog ==
+
+= 6.6.6 (2024/11/04) =
+* Fix: Meta Viewer tooltips.
+* Info: Wah, what a version number! 😅 Well, if you noticed that too, and never wrote a review for this plugin, maybe this is the moment! Please [write a review](https://wordpress.org/support/plugin/wp-retina-2x/reviews/#new-post) for the plugin if you are happy with it, with a little 666 mention! 👹 We are trying our best to bring many new features to you. Thank you! 💕
+
+= 6.6.5 (2024/10/17) =
+* Fix: Handle more errors coming from server.
+* Fix: Count was wrong in the stats.
+* Fix: Links to docs.
+
+= 6.6.4 (2024/09/18) =
+* Fix: Make sure size names is an array.
 
 = 6.6.3 (2024/08/01) =
 * Fix: Make sure image is created prior to palette conversion.
@@ -336,7 +348,6 @@ The Pro version adds support for Retina for full-size, support for lazy-loading 
 * Fix: Don't delete the full-size Retina if we re-generate.
 * Fix: Little issue with Ignore.
 * Update: Additional debugging.
-* Info: Please write a review for the plugin if you are happy with it. I am trying my best to make this plugin to work with every kind of WP install and system :)
 
 = 4.7.4 =
 * Update: Retina was moved into a new Meow Apps menu. The whole Meow Apps menu can be then hidden. For a nicer WP admin. The whole admin UI was updated.

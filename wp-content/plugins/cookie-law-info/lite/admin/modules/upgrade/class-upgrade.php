@@ -49,7 +49,7 @@ class Upgrade extends Modules {
 	 */
 	public function init() {
 		add_action( 'admin_init', array( $this, 'migrate' ) );
-		$this->add_migration_notice();
+		add_action( 'admin_init', array( $this, 'add_migration_notice' ) );
 		add_action( 'admin_init', array( $this, 'revert' ) );
 	}
 

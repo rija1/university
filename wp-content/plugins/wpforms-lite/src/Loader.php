@@ -201,9 +201,6 @@ class Loader {
 				'id'   => 'notifications',
 			],
 			[
-				'name' => 'Admin\Notifications\EventDriven',
-			],
-			[
 				'name' => 'Admin\Entries\Handler',
 				'hook' => 'admin_init',
 			],
@@ -291,10 +288,6 @@ class Loader {
 			[
 				'name' => 'Admin\Addons\GoogleSheets',
 				'hook' => 'admin_init',
-			],
-			[
-				'name' => 'Admin\Addons\Calculations',
-				'id'   => 'calculations',
 			],
 			[
 				'name' => 'Admin\PluginList',
@@ -559,6 +552,9 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\Builder\Ajax\PanelLoader',
+			],
+			[
+				'name' => 'Admin\Builder\Addons',
 			]
 		);
 	}
@@ -789,6 +785,7 @@ class Loader {
 			$this->classes,
 			[
 				'name' => 'AntiSpam\CountryFilter',
+				'id'   => 'antispam_country_filter',
 				'hook' => 'init',
 			],
 			[

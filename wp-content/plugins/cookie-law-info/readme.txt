@@ -1,15 +1,15 @@
 === CookieYes - Cookie Banner for Cookie Consent (Easy to setup GDPR/CCPA Compliant Cookie Notice) ===
 Contributors: webtoffee, cookieyesdev
 Donate link: https://www.cookieyes.com/ 
-Tags: GDPR, CCPA, cookie notice, DSGVO, cookie consent, cookie banner, eu cookie law, cookieyes, eprivacy, gdpr consent
+Tags: cookie notice, cookie consent, cookie banner, eu cookie law, cookieyes
 Requires at least: 5.0.0
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 3.2.6
+Stable tag: 3.2.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Easily set up cookie banner or cookie notice and cookie policy page for GDPR (DSGVO, RGPD) compliance. Also supports CCPA/CPRA and other major global laws.
+Easily set up cookie consent banner, notice, and policy pages for compliance with global cookie laws (GDPR, DSGVO, RGPD, CCPA/CPRA, etc).
 
 == Description ==
 
@@ -23,7 +23,7 @@ Our cookie plugin ranks among the top WordPress solutions for cookie compliance 
 
 - **Cookie consent banner**: The plugin will enable a cookie consent banner with Accept and Reject options.
 
-- **Customization**: Customize the cookie notice style so it blends with your existing website: change the colors, fonts, styles, position on the page, and even how it behaves when you click “Accept All”.
+- **Customization**: Customize the cookie notice style so it blends with your existing website: change the colours, fonts, styles, position on the page, and even how it behaves when you click “Accept All”.
 
 - **Automatic scanning**: Single-click automatic scanning and categorization of cookies.
 
@@ -33,7 +33,7 @@ Our cookie plugin ranks among the top WordPress solutions for cookie compliance 
 
 - **Preference center**: Offer a second layer of control through a preference center within the banner. Allow site visitors to provide granular consent for specific cookie categories, giving them the choice to opt in or opt-out.
 
-- **Revisit consent button**: Visitors can either permanently dismiss the cookie banner or access it later through a revisit consent button, which can be tailored in terms of color and position.
+- **Revisit consent button**: Visitors can either permanently dismiss the cookie banner or access it later through a revisit consent button, which can be tailored in terms of colour and position.
 
 - **Consent logging**: Log users' consent and export it into a CSV file.
 
@@ -206,6 +206,19 @@ Every time we update the plugin, you will see a notification on the installed pl
 
 == Changelog ==
 
+= 3.2.8 =
+
+[Compatibility] – Tested OK with WordPress version 6.7
+[Add] - Support Custom name for dataLayer
+[Fix] - Minor bug fixes.
+
+= 3.2.7 =
+
+[Add] - Implemented exit intent popup.
+[Tweak] - Declared compliance with WP Consent API.
+[Enhancement] - UI/UX improvements.
+[Fix] - Minor bug fixes.
+
 = 3.2.6 =
 
 [Compatibility] – Tested OK with WordPress version 6.6
@@ -303,13 +316,13 @@ Tested OK with WordPress version 6.2
 = 3.0.7 = 
 
 [Enhancement] - New CCPA Opt-out center
-[Fix] - Not able to change the Optout preference center text color
+[Fix] - Not able to change the Optout preference center text colour
 [Fix] - Not able to disable the "Reject All" button from preference center
 
 = 3.0.6 = 
 
 [Enhancement] - Clickable video placeholders
-[Fix] - Revisit consent button color is not reset on colour scheme changes
+[Fix] - Revisit consent button colour is not reset on colour scheme changes
 
 = 3.0.5 = 
 
@@ -340,7 +353,7 @@ Tested OK with WordPress version 6.2
 
 * UI/UX improvements
 * New cookie consent banner design (compliant with WCAG guidelines)
-* Advanced banner customization options (GDPR/CCPA cookie banner templates, set consent expiration period, enable/disable prior consent, show/hide categories on the banner, new banner layouts, advanced content customization, light/dark/custom color scheme, etc.)
+* Advanced banner customization options (GDPR/CCPA cookie banner templates, set consent expiration period, enable/disable prior consent, show/hide categories on the banner, new banner layouts, advanced content customization, light/dark/custom colour scheme, etc.)
 * Banner preview in the customizer
 * Pre-built translations for multiple languages
 * Privacy Policy Generator
@@ -688,7 +701,7 @@ Tested OK with WordPress version 6.2
 = 1.1 =
 * New feature: auto-hide cookie bar after (configurable) delay
 * New feature: added responsive design to cookie audit table (thanks to Mark Wiltshire)
-* Upgrade: now using WP3.5 color picker
+* Upgrade: now using WP3.5 colour picker
 * Bug fix: Cookie Audit table now shows maximum of 50 posts (was 10, which was a bit restrictive)
 * Bug fix: Cookie Law Info now only visible to admins
 * Bug fix: fixed typo on Dashboard help section for the [delete_cookies] shortcode
@@ -719,8 +732,8 @@ Tested OK with WordPress version 6.2
 
 == Upgrade Notice ==
 
-= 3.2.6 =
+= 3.2.8 =
 
-[Compatibility] – Tested OK with WordPress version 6.6
-[Add] - WP Consent API integration.
-[Add] - Option to enable/disable the close button on US state laws banner.
+[Compatibility] – Tested OK with WordPress version 6.7
+[Add] - Support Custom name for dataLayer
+[Fix] - Minor bug fixes.

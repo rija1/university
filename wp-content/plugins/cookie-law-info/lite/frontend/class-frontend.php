@@ -179,7 +179,12 @@ class Frontend {
 			wp_localize_script( $this->plugin_name, '_ckyStyles', array( 'css' => $css ) );
 		}
 		if ( true === $this->is_wpconsentapi_enabled() ) {
-			wp_enqueue_script( $this->plugin_name.'-wca', plugin_dir_url( __FILE__ ) . 'js/wca' . $suffix . '.js', array(), $this->version, false );
+			$handle = $this->plugin_name . '-wca';
+			wp_register_script( $handle, plugin_dir_url( __FILE__ ) . 'js/wca' . $suffix . '.js', array(), $this->version, false );
+			if ( true === $this->is_gsk_enabled() ) {
+				wp_add_inline_script( $handle, 'const _ckyGsk = true;', 'before' );
+			}
+			wp_enqueue_script( $handle );
 		}
 	}
 
@@ -580,5 +585,17 @@ var _ckyGcm = <?php echo $gcm_json; ?>;
 	 */
 	public function is_wpconsentapi_enabled() {
 		return class_exists( 'WP_CONSENT_API' );
+	}
+
+	/**
+	 * Check whether the Google Site Kit plugin is enabled
+	 *
+	 * @return boolean
+	 */
+	public function is_gsk_enabled() {
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		return is_plugin_active( 'google-site-kit/google-site-kit.php' );
 	}
 }

@@ -55,13 +55,6 @@ class Cookie_Law_Info_Cookie_Scaner extends Cookie_Law_Info_Cookieyes {
 	 */
 
 	public function __construct() {
-		$this->status_labels = array(
-			0 => '',
-			1 => __( 'Incomplete', 'cookie-law-info' ),
-			2 => __( 'Completed', 'cookie-law-info' ),
-			3 => __( 'Stopped', 'cookie-law-info' ),
-			4 => __( 'Failed', 'cookie-law-info' ),
-		);
 		add_action( 'admin_menu', array( $this, 'add_admin_pages' ), 5 );
 		add_action( 'wt_cli_cookie_scanner_body', array( $this, 'scanner_notices' ) );
 		add_action( 'init', array( $this, 'init' ) );
@@ -377,16 +370,6 @@ class Cookie_Law_Info_Cookie_Scaner extends Cookie_Law_Info_Cookieyes {
 			'total_cookies'      => 0,
 		);
 		$wpdb->insert( $url_table, $data_arr );
-	}
-
-	/**
-	 * Get current scan status text
-	 *
-	 * @param [type] $status current status of the scan.
-	 * @return string
-	 */
-	public function get_scan_status_text( $status ) {
-		return isset( $this->status_labels[ $status ] ) ? $this->status_labels[ $status ] : __( 'Unknown', 'cookie-law-info' );
 	}
 	/**
 	 * Return the last scan results

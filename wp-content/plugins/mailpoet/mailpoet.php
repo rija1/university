@@ -5,17 +5,17 @@ if (!defined('ABSPATH')) exit;
 
 /*
  * Plugin Name: MailPoet
- * Version: 5.0.2
+ * Version: 5.4.2
  * Plugin URI: https://www.mailpoet.com
  * Description: Create and send newsletters, post notifications and welcome emails from your WordPress.
  * Author: MailPoet
  * Author URI: https://www.mailpoet.com
- * Requires at least: 6.4
+ * Requires at least: 6.6
  * Text Domain: mailpoet
  * Domain Path: /lang
  *
- * WC requires at least: 8.8.3
- * WC tested up to: 8.9.1
+ * WC requires at least: 9.3.3
+ * WC tested up to: 9.4.2
  *
  * @package WordPress
  * @author MailPoet
@@ -23,15 +23,15 @@ if (!defined('ABSPATH')) exit;
  */
 
 $mailpoetPlugin = [
-  'version' => '5.0.2',
+  'version' => '5.4.2',
   'filename' => __FILE__,
   'path' => dirname(__FILE__),
   'autoloader' => dirname(__FILE__) . '/vendor/autoload.php',
   'initializer' => dirname(__FILE__) . '/mailpoet_initializer.php',
 ];
 
-const MAILPOET_MINIMUM_REQUIRED_WP_VERSION = '6.4';
-const MAILPOET_MINIMUM_REQUIRED_WOOCOMMERCE_VERSION = '7.9';// Older versions lead to fatal errors
+const MAILPOET_MINIMUM_REQUIRED_WP_VERSION = '6.6';
+const MAILPOET_MINIMUM_REQUIRED_WOOCOMMERCE_VERSION = '9.3';
 
 function mailpoet_deactivate_plugin() {
   deactivate_plugins(plugin_basename(__FILE__));
@@ -61,7 +61,7 @@ if (!function_exists('is_plugin_active')) {
   require_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
 if (is_plugin_active('woocommerce/woocommerce.php')) {
-  $woocommerceVersion = get_plugin_data(WP_PLUGIN_DIR . '/woocommerce/woocommerce.php')['Version'];
+  $woocommerceVersion = get_plugin_data(WP_PLUGIN_DIR . '/woocommerce/woocommerce.php', false, false)['Version'];
   if (version_compare($woocommerceVersion, MAILPOET_MINIMUM_REQUIRED_WOOCOMMERCE_VERSION, '<')) {
     add_action('admin_notices', 'mailpoet_woocommerce_version_notice');
     // deactivate the plugin

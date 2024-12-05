@@ -7,7 +7,7 @@ class Meow_WR2X_Engine {
     public function __construct( $core ) {
         $this->core = $core;
         add_filter( 'wp_generate_attachment_metadata', array( $this, 'wp_generate_attachment_metadata' ) );
-        add_action( 'delete_attachment', array( $this, 'delete_attachment' ) );
+        add_action( 'delete_attachment', array( $this, 'delete_attachment' ), 10, 2 );
 	}
 
     // Resize the image
@@ -247,8 +247,15 @@ class Meow_WR2X_Engine {
 		if ( $webp = $this->core->get_webp( $uploads['basedir'] . '/' . $meta['file'] ) ) {
 			$meta['file'] = substr( $webp, strlen( $uploads['basedir'] ) + 1 );
 			$dim = getimagesize( $webp );
-			$meta['width']  = $dim[0];
-			$meta['height'] = $dim[1];
+			if ($dim !== false) {
+				$meta['width']  = $dim[0];
+				$meta['height'] = $dim[1];
+			} else {
+				// Handle the error case where getimagesize fails
+				$this->core->log( "[ERROR] Could not get dimensions of WebP file '{$webp}'." );
+				$meta['width']  = 0;
+				$meta['height'] = 0;
+			}
 		}
 
 		$originalfile = $meta['file'];
@@ -498,7 +505,15 @@ class Meow_WR2X_Engine {
     // -------------------------
     // Delete functions
     // -------------------------
-    function delete_attachment( $attach_id, $deleteFullSize = true) {
+    function delete_attachment( $attach_id, $post ) {
+
+		$deleteFullSize = true;
+		$shouldDeleteWr2x = add_filter( 'wr2x_should_delete_attachment', true, $attach_id, $post );
+
+		if ( !$shouldDeleteWr2x ) {
+			return;
+		}
+
         $meta = wp_get_attachment_metadata( $attach_id );
         $this->delete_retina_images( $meta, $deleteFullSize );
         $this->delete_webp_images( $meta, $deleteFullSize );

@@ -372,6 +372,7 @@ class Meow_WR2X_Rest
 		}
 		return (int)$wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts p 
 			WHERE post_type='attachment'
+			AND post_mime_type LIKE 'image/%'
 			$whereSql"
 		);
 	}

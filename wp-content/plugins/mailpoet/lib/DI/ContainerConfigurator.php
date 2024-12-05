@@ -40,7 +40,6 @@ class ContainerConfigurator implements IContainerConfigurator {
     $container->autowire(\MailPoet\AdminPages\Pages\AutomationEditor::class)->setPublic(true);
     $container->autowire(\MailPoet\AdminPages\Pages\AutomationAnalytics::class)->setPublic(true);
     $container->autowire(\MailPoet\AdminPages\Pages\DynamicSegments::class)->setPublic(true);
-    $container->autowire(\MailPoet\AdminPages\Pages\EmailEditor::class)->setPublic(true);
     $container->autowire(\MailPoet\AdminPages\Pages\ExperimentalFeatures::class)->setPublic(true);
     $container->autowire(\MailPoet\AdminPages\Pages\FormEditor::class)->setPublic(true);
     $container->autowire(\MailPoet\AdminPages\Pages\Forms::class)->setPublic(true);
@@ -340,30 +339,38 @@ class ContainerConfigurator implements IContainerConfigurator {
     $container->autowire(\MailPoet\CustomFields\ApiDataSanitizer::class);
     $container->autowire(\MailPoet\CustomFields\CustomFieldsRepository::class)->setPublic(true);
     // Email Editor
-    $container->autowire(\MailPoet\EmailEditor\Engine\EmailEditor::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\EmailApiController::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\SettingsController::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\ThemeController::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Postprocessors\HighlightingPostprocessor::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Postprocessors\VariablesPostprocessor::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\BlocksWidthPreprocessor::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\CleanupPreprocessor::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\SpacingPreprocessor::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\TypographyPreprocessor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Email_Editor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Email_Api_Controller::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Settings_Controller::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Theme_Controller::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Send_Preview_Email::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Postprocessors\Highlighting_Postprocessor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Postprocessors\Variables_Postprocessor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\Blocks_Width_Preprocessor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\Cleanup_Preprocessor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\Spacing_Preprocessor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\Typography_Preprocessor::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\Renderer::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Engine\Templates\Templates::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Engine\Templates\Utils::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Templates\TemplatePreview::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Templates\Template_Preview::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Engine\Patterns\Patterns::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\ContentRenderer::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\BlocksRegistry::class)->setPublic(true);
-    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\ProcessManager::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Content_Renderer::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Blocks_Registry::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Process_Manager::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Integrations\Core\Initializer::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\Cli::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\EmailEditor::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\EditorPageRenderer::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\EmailApiController::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\EmailEditorPreviewEmail::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\Blocks\BlockTypesController::class)->setPublic(true);
     $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\Blocks\BlockTypes\PoweredByMailpoet::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\Patterns\PatternsController::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\PersonalizationTags\Personalization_Tags_Registry::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Engine\Personalizer::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\PersonalizationTags\Subscriber::class)->setPublic(true);
+    $container->autowire(\MailPoet\EmailEditor\Integrations\MailPoet\PersonalizationTagManager::class)->setPublic(true);
     // Features
     $container->autowire(\MailPoet\Features\FeaturesController::class)->setPublic(true);
     $container->autowire(\MailPoet\Features\FeatureFlagsController::class)->setPublic(true);
@@ -672,6 +679,10 @@ class ContainerConfigurator implements IContainerConfigurator {
     $container->autowire(\MailPoet\Cache\TransientCache::class)->setPublic(true);
     // Tags
     $container->autowire(\MailPoet\Tags\TagRepository::class)->setPublic(true);
+    // CAPTCHA
+    $container->autowire(\MailPoet\Config\HooksReCaptcha::class)->setPublic(true);
+    $container->autowire(\MailPoet\Captcha\ReCaptchaValidator::class)->setPublic(true);
+    $container->autowire(\MailPoet\Captcha\ReCaptchaRenderer::class)->setPublic(true);
     return $container;
   }
 
