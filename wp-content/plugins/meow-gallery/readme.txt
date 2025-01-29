@@ -4,7 +4,7 @@ Tags: gallery, masonry, image, block, lightroom
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 5.2.1
+Stable tag: 5.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,10 +50,24 @@ Languages: English.
 
 == Changelog ==
 
+= 5.2.4 (2025/01/15) =
+* Fix: Issue with how the JSON attributes were escaped.
+* Update: Enhanced the UI of the blocks.
+
+= 5.2.3 (2025/01/04) =
+* Update: Improved escaping related to JSON gallery attributes.
+* Fix: Check if the shortcode ID is set and not empty.
+* Add: Native horizontal scrolling in Horizontal layout settings.
+* Update: Removed max attributes for layouts.
+* Add: Galleries and Collections Management now available in the Gallery Block.
+* Note: We need some love! If you have a moment, please write a little [review for the Meow Gallery](https://wordpress.org/support/plugin/meow-gallery/reviews/?rate=5#new-post). Thank you! 💕
+
+= 5.2.2 (2024/12/06) =
+* Add: Caption Backgrounds in the Settings.
+
 = 5.2.1 (2024/11/04) =
 * Add: "Load More" option for Infinite Scroll.
 * Fix: Media Selector limitations.
-* Note: We need some love! If you have a moment, please write a little [review for the Meow Gallery](https://wordpress.org/support/plugin/meow-gallery/reviews/?rate=5#new-post). Thank you! 💕
 
 = 5.2.0 (2024/10/17) =
 * Update: PhotoSwipe now works with Infinite Scrolling.

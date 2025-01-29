@@ -5,6 +5,8 @@ namespace MailPoet\Config;
 if (!defined('ABSPATH')) exit;
 
 
+use MailPoet\Captcha\CaptchaHooks;
+use MailPoet\Captcha\ReCaptchaHooks;
 use MailPoet\Cron\CronTrigger;
 use MailPoet\Form\DisplayFormInWPContent;
 use MailPoet\Mailer\WordPress\WordpressMailerReplacer;
@@ -74,9 +76,6 @@ class Hooks {
   /** @var HooksWooCommerce */
   private $hooksWooCommerce;
 
-  /** @var HooksReCaptcha */
-  private $reCaptcha;
-
   /** @var SubscriberChangesNotifier */
   private $subscriberChangesNotifier;
 
@@ -85,6 +84,12 @@ class Hooks {
 
   /** @var AutomateWooHooks */
   private $automateWooHooks;
+
+  /** @var CaptchaHooks */
+  private $captchaHooks;
+
+  /** @var ReCaptchaHooks */
+  private $reCaptchaHooks;
 
   /** @var WooSystemInfoController */
   private $wooSystemInfoController;
@@ -106,7 +111,8 @@ class Hooks {
     WordpressMailerReplacer $wordpressMailerReplacer,
     DisplayFormInWPContent $displayFormInWPContent,
     HooksWooCommerce $hooksWooCommerce,
-    HooksReCaptcha $reCaptcha,
+    CaptchaHooks $captchaHooks,
+    ReCaptchaHooks $reCaptchaHooks,
     SubscriberHandler $subscriberHandler,
     SubscriberChangesNotifier $subscriberChangesNotifier,
     WP $wpSegment,
@@ -128,7 +134,8 @@ class Hooks {
     $this->wpSegment = $wpSegment;
     $this->subscriberHandler = $subscriberHandler;
     $this->hooksWooCommerce = $hooksWooCommerce;
-    $this->reCaptcha = $reCaptcha;
+    $this->captchaHooks = $captchaHooks;
+    $this->reCaptchaHooks = $reCaptchaHooks;
     $this->subscriberChangesNotifier = $subscriberChangesNotifier;
     $this->dotcomLicenseProvisioner = $dotcomLicenseProvisioner;
     $this->automateWooHooks = $automateWooHooks;
@@ -154,6 +161,7 @@ class Hooks {
     $this->setupSettingsLinkInPluginPage();
     $this->setupChangeNotifications();
     $this->setupLicenseProvisioning();
+    $this->setupCaptchaOnRegisterForm();
     $this->deactivateMailPoetCronBeforePluginUpgrade();
   }
 
@@ -162,7 +170,12 @@ class Hooks {
   }
 
   public function setupSubscriptionEvents() {
-    $subscribe = $this->settings->get('subscribe', []);
+    // In some cases on multisite instance, this code may run before DB migrator and settings table is not ready at that time
+    try {
+      $subscribe = $this->settings->get('subscribe', []);
+    } catch (\Exception $e) {
+      $subscribe = [];
+    }
     // Subscribe in comments
     if (
       isset($subscribe['on_comment']['enabled'])
@@ -241,44 +254,6 @@ class Hooks {
       );
     }
 
-    // reCAPTCHA on WP registration form
-    if ($this->reCaptcha->isEnabled()) {
-      $this->wp->addAction(
-        'login_enqueue_scripts',
-        [$this->reCaptcha, 'enqueueScripts']
-      );
-
-      $this->wp->addAction(
-        'register_form',
-        [$this->reCaptcha, 'render']
-      );
-
-      $this->wp->addFilter(
-        'registration_errors',
-        [$this->reCaptcha, 'validate'],
-        10,
-        3
-      );
-
-      // reCAPTCHA on WC registration form
-      if ($this->wooHelper->isWooCommerceActive()) {
-        $this->wp->addAction(
-          'woocommerce_before_customer_login_form',
-          [$this->reCaptcha, 'enqueueScripts']
-        );
-
-        $this->wp->addAction(
-          'woocommerce_register_form',
-          [$this->reCaptcha, 'render']
-        );
-
-        $this->wp->addAction(
-          'woocommerce_process_registration_errors',
-          [$this->reCaptcha, 'validate']
-        );
-      }
-    }
-
     // Manage subscription
     $this->wp->addAction(
       'admin_post_mailpoet_subscription_update',
@@ -328,7 +303,12 @@ class Hooks {
   }
 
   public function setupWooCommerceSubscriptionEvents() {
-    $optInEnabled = (bool)$this->settings->get(Subscription::OPTIN_ENABLED_SETTING_NAME, false);
+    // In some cases on multisite instance, this code may run before DB migrator and settings table is not ready at that time
+    try {
+      $optInEnabled = (bool)$this->settings->get(Subscription::OPTIN_ENABLED_SETTING_NAME, false);
+    } catch (\Exception $e) {
+      $optInEnabled = false;
+    }
     // WooCommerce: subscribe on checkout
     if ($optInEnabled) {
       $optInPosition = $this->settings->get(Subscription::OPTIN_POSITION_SETTING_NAME, self::DEFAULT_OPTIN_POSITION);
@@ -619,6 +599,71 @@ class Hooks {
       10,
       3
     );
+  }
+
+  // CAPTCHA on WP & WC registration forms
+  public function setupCaptchaOnRegisterForm(): void {
+    if ($this->captchaHooks->isEnabled()) {
+      $this->wp->addAction(
+        'register_form',
+        [$this->captchaHooks, 'renderInWPRegisterForm']
+      );
+
+      $this->wp->addAction(
+        'registration_errors',
+        [$this->captchaHooks, 'validate'],
+        10,
+        3
+      );
+
+      if ($this->wooHelper->isWooCommerceActive()) {
+        $this->wp->addAction(
+          'woocommerce_register_form',
+          [$this->captchaHooks, 'renderInWCRegisterForm']
+        );
+
+        $this->wp->addFilter(
+          'woocommerce_process_registration_errors',
+          [$this->captchaHooks, 'validate'],
+          10,
+          3
+        );
+      }
+    } else if ($this->reCaptchaHooks->isEnabled()) {
+      $this->wp->addAction(
+        'login_enqueue_scripts',
+        [$this->reCaptchaHooks, 'enqueueScripts']
+      );
+
+      $this->wp->addAction(
+        'register_form',
+        [$this->reCaptchaHooks, 'render']
+      );
+
+      $this->wp->addFilter(
+        'registration_errors',
+        [$this->reCaptchaHooks, 'validate'],
+        10,
+        3
+      );
+
+      if ($this->wooHelper->isWooCommerceActive()) {
+        $this->wp->addAction(
+          'woocommerce_before_customer_login_form',
+          [$this->reCaptchaHooks, 'enqueueScripts']
+        );
+
+        $this->wp->addAction(
+          'woocommerce_register_form',
+          [$this->reCaptchaHooks, 'render']
+        );
+
+        $this->wp->addAction(
+          'woocommerce_process_registration_errors',
+          [$this->reCaptchaHooks, 'validate']
+        );
+      }
+    }
   }
 
   public function deactivateMailPoetCronBeforePluginUpgrade(): void {

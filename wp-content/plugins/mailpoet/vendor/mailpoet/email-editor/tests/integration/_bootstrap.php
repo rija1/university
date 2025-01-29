@@ -3,6 +3,7 @@ declare(strict_types = 1);
 if (!defined('ABSPATH')) exit;
 use Codeception\Stub;
 use MailPoet\EmailEditor\Container;
+use MailPoet\EmailEditor\Engine\Dependency_Check;
 use MailPoet\EmailEditor\Engine\Email_Api_Controller;
 use MailPoet\EmailEditor\Engine\Email_Editor;
 use MailPoet\EmailEditor\Engine\Patterns\Patterns;
@@ -18,10 +19,9 @@ use MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Preprocessors\Typograph
 use MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Process_Manager;
 use MailPoet\EmailEditor\Engine\Renderer\Renderer;
 use MailPoet\EmailEditor\Engine\Settings_Controller;
-use MailPoet\EmailEditor\Engine\Templates\Template_Preview;
 use MailPoet\EmailEditor\Engine\Templates\Templates;
-use MailPoet\EmailEditor\Engine\Templates\Utils;
 use MailPoet\EmailEditor\Engine\Theme_Controller;
+use MailPoet\EmailEditor\Engine\User_Theme;
 use MailPoet\EmailEditor\Integrations\Core\Initializer;
 use MailPoet\EmailEditor\Integrations\MailPoet\Blocks\BlockTypesController;
 use MailPoet\EmailEditor\Engine\Send_Preview_Email;
@@ -48,6 +48,10 @@ abstract class MailPoetTest extends \Codeception\TestCase\Test { // phpcs:ignore
  $this->initContainer();
  parent::setUp();
  }
+ public function _after() {
+ parent::_after();
+ $this->tester->cleanup();
+ }
  protected function checkValidHTML( string $html ): void {
  $dom = new \DOMDocument();
  libxml_use_internal_errors( true );
@@ -71,12 +75,6 @@ abstract class MailPoetTest extends \Codeception\TestCase\Test { // phpcs:ignore
  }
  );
  $container->set(
- Email_Api_Controller::class,
- function () {
- return new Email_Api_Controller();
- }
- );
- $container->set(
  BlockTypesController::class,
  function () {
  return $this->createMock( BlockTypesController::class );
@@ -84,15 +82,15 @@ abstract class MailPoetTest extends \Codeception\TestCase\Test { // phpcs:ignore
  );
  // End: MailPoet plugin dependencies.
  $container->set(
- Utils::class,
- function () {
- return new Utils();
- }
- );
- $container->set(
  Theme_Controller::class,
  function () {
  return new Theme_Controller();
+ }
+ );
+ $container->set(
+ User_Theme::class,
+ function () {
+ return new User_Theme();
  }
  );
  $container->set(
@@ -109,18 +107,8 @@ abstract class MailPoetTest extends \Codeception\TestCase\Test { // phpcs:ignore
  );
  $container->set(
  Templates::class,
- function ( $container ) {
- return new Templates( $container->get( Utils::class ) );
- }
- );
- $container->set(
- Template_Preview::class,
- function ( $container ) {
- return new Template_Preview(
- $container->get( Theme_Controller::class ),
- $container->get( Settings_Controller::class ),
- $container->get( Templates::class ),
- );
+ function () {
+ return new Templates();
  }
  );
  $container->set(
@@ -220,12 +208,25 @@ abstract class MailPoetTest extends \Codeception\TestCase\Test { // phpcs:ignore
  }
  );
  $container->set(
+ Email_Api_Controller::class,
+ function ( $container ) {
+ return new Email_Api_Controller(
+ $container->get( Personalization_Tags_Registry::class ),
+ );
+ }
+ );
+ $container->set(
+ Dependency_Check::class,
+ function () {
+ return new Dependency_Check();
+ }
+ );
+ $container->set(
  Email_Editor::class,
  function ( $container ) {
  return new Email_Editor(
  $container->get( Email_Api_Controller::class ),
  $container->get( Templates::class ),
- $container->get( Template_Preview::class ),
  $container->get( Patterns::class ),
  $container->get( Settings_Controller::class ),
  $container->get( Send_Preview_Email::class ),
