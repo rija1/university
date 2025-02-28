@@ -7,12 +7,6 @@ Version:      1.0.0
 Text Domain:  twentytwentyfour
 */
 
-a:focus,  div:focus{
-    outline: none !important;
-    border: none !important; 
-}
-
-
 // Variables
 // ----------------------------------------------------------------------------
 $colors: (
@@ -94,12 +88,6 @@ $colors: (
   animation: puff-in-center 0.7s cubic-bezier(0.47, 0, 0.745, 0.715) 1.3s both;
 }
 
-// Global Styles
-// ----------------------------------------------------------------------------
-:where(.wp-site-blocks *:focus) {
-  outline-width: 2px;
-  outline-style: solid;
-}
 
 // Layout Components
 // ----------------------------------------------------------------------------
