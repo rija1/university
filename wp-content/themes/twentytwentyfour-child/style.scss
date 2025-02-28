@@ -7,6 +7,12 @@ Version:      1.0.0
 Text Domain:  twentytwentyfour
 */
 
+a:focus,  div:focus{
+    outline: none !important;
+    border: none !important; 
+}
+
+
 // Variables
 // ----------------------------------------------------------------------------
 $colors: (
@@ -22,6 +28,7 @@ $colors: (
 @mixin navigation-item($color) {
   border-bottom: solid 3px $color;
   &:hover {
+    // color: #fff
     background-color: $color;
   }
 }

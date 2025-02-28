@@ -6,6 +6,11 @@ Template:     twentytwentyfour
 Version:      1.0.0
 Text Domain:  twentytwentyfour
 */
+a:focus, div:focus {
+  outline: none !important;
+  border: none !important;
+}
+
 @font-face {
   font-family: "FontAwesome";
   src: url("fonts/fa-solid-900.ttf") format("truetype");
