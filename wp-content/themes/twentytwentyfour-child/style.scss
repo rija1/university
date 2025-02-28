@@ -7,159 +7,162 @@ Version:      1.0.0
 Text Domain:  twentytwentyfour
 */
 
-// Site colors
+// Variables
+// ----------------------------------------------------------------------------
+$colors: (
+  'darkblue': #194b57,
+  'blue': #4881b6,
+  'lightblue': #70b7ac,
+  'red': #b42127,
+  'yellow': #f8bd3b
+);
 
-$colour_darkblue: #194b57;
-$colour_blue: #4881b6;
-$colour_lightblue: #70b7ac;
-$colour_red: #b42127;
-$colour_yellow: #f8bd3b;
+// Mixins
+// ----------------------------------------------------------------------------
+@mixin navigation-item($color) {
+  border-bottom: solid 3px $color;
+  &:hover {
+    background-color: $color;
+  }
+}
 
+@mixin card-image-hover {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 5px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+  }
+}
+
+// Font Declarations
+// ----------------------------------------------------------------------------
 @font-face {
-    font-family: "FontAwesome";
-    src:
-        // url("fonts/fontawesome-webfont-webfont.woff2") format("woff2"),
-        // url("fonts/fontawesome-webfont-webfont.woff") format("woff"),
-        url("fonts/fa-solid-900.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
+  font-family: "FontAwesome";
+  src: url("fonts/fa-solid-900.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 
+// Animations
+// ----------------------------------------------------------------------------
+@keyframes fade-in-fwd {
+  0% {
+    transform: translateZ(-80px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateZ(0);
+    opacity: 1;
+  }
+}
+
+@keyframes puff-in-center {
+  0% {
+    transform: scale(2);
+    filter: blur(4px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+// Animation Classes
+.fade-in-fwd {
+  animation: fade-in-fwd 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+
+.fade-in-fwd-delay {
+  animation: fade-in-fwd 0.8s cubic-bezier(0.39, 0.575, 0.565, 1) 0.7s both;
+}
+
+.puff-in-center {
+  animation: puff-in-center 0.7s cubic-bezier(0.47, 0, 0.745, 0.715) 1.3s both;
+}
+
+// Global Styles
+// ----------------------------------------------------------------------------
 :where(.wp-site-blocks *:focus) {
-    outline: none;
+  outline-width: 2px;
+  outline-style: solid;
 }
 
-// Header Hero Group
+// Layout Components
+// ----------------------------------------------------------------------------
 
+// Header
 .header_hero_group {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
 }
 
 // Navigation
-
 header nav.wp-block-navigation .wp-block-navigation__container {
-    // gap: 5px;
+  > li {
+    padding: 10px 15px;
 
-    > li {
-        padding: 10px 15px 10px 15px;
-        a {
-            &:hover {
-                text-decoration: none;
-            }
-        }
-        &:hover {
-            transition: 1400ms;
-            border: none;
-            > a {
-                // color: #ffffff;
-            }
-            button {
-                transition: 1400ms;
-            }
-        }
+    a {
+      &:hover {
+        text-decoration: none;
+      }
     }
 
-    // Targeting the first list item
-    > li:nth-child(1) {
-        border-bottom: solid 3px $colour_lightblue;
-        &:hover {
-            background-color: $colour_lightblue;
-        }
+    &:hover {
+      transition: 1400ms;
+      border: none;
+      
+      button {
+        transition: 1400ms;
+      }
     }
+  }
 
-    // Targeting the second list item
-    > li:nth-child(2) {
-        border-bottom: solid 3px $colour_red;
-        &:hover {
-            background-color: $colour_red;
-        }
-    }
-
-    // Targeting the third list item
-    > li:nth-child(3) {
-        border-bottom: solid 3px $colour_yellow;
-        &:hover {
-            background-color: $colour_yellow;
-        }
-    }
-
-    // Targeting the fourth list item
-    > li:nth-child(4) {
-        border-bottom: solid 3px $colour_darkblue;
-        &:hover {
-            background-color: $colour_darkblue;
-        }
-    }
-
-    // Targeting the fourth list item
-    > li:nth-child(5) {
-        border-bottom: solid 3px $colour_blue;
-        &:hover {
-            background-color: $colour_blue;
-        }
-    }
+  // Colored navigation items
+  > li:nth-child(1) { @include navigation-item(map-get($colors, 'lightblue')); }
+  > li:nth-child(2) { @include navigation-item(map-get($colors, 'red')); }
+  > li:nth-child(3) { @include navigation-item(map-get($colors, 'yellow')); }
+  > li:nth-child(4) { @include navigation-item(map-get($colors, 'darkblue')); }
+  > li:nth-child(5) { @include navigation-item(map-get($colors, 'blue')); }
 }
 
-// Homepage
-
-// // CTA
-
+// Homepage CTAs
+// ----------------------------------------------------------------------------
 .home_cta {
-    position: relative;
-    h2 {
-        text-align: center;
-        // font-size: 35px;
-        &::before {
-            font-family: "FontAwesome";
-            font-size: 38px;
-            content: "";
-            // content: "\f10d";
-            padding-right: 30px;
-        }
+  position: relative;
+  
+  h2 {
+    text-align: center;
+    
+    &::before {
+      font-family: "FontAwesome";
+      font-size: 38px;
+      content: "";
+      padding-right: 30px;
     }
+  }
 }
 
-.home_cta_1 {
-    h2::before {
-        content: "\f19c";
-    }
-}
+// CTA Icons
+.home_cta_1 h2::before { content: "\f19c"; }
+.home_cta_2 h2::before { content: "\f19d"; }
+.home_cta_3 h2::before { content: "\f655"; }
+.home_cta_4 h2::before { content: "\f1ce"; }
 
-.home_cta_2 {
-    h2::before {
-        content: "\f19d";
-    }
-}
-
-.home_cta_3 {
-    h2::before {
-        content: "\f655";
-    }
-}
-
-.home_cta_4 {
-    h2::before {
-        content: "\f1ce";
-    }
-}
-
-// From Theme Editor
-
-:where(.wp-site-blocks *:focus) {
-    outline-width: 2px;
-    outline-style: solid;
-}
-
-/* Link Anim - Start */
-
+// Links & Titles
+// ----------------------------------------------------------------------------
 .wp-block-post-title a {
-    position: relative;
-    text-decoration: none;
-}
-
-.wp-block-post-title a::before {
+  position: relative;
+  text-decoration: none;
+  
+  &::before {
     content: "";
     position: absolute;
     display: block;
@@ -171,128 +174,49 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     transform: scaleX(0);
     transform-origin: top left;
     transition: transform 0.3s ease;
-}
-
-.wp-block-post-title a:hover::before {
+  }
+  
+  &:hover::before {
     transform: scaleX(1);
+  }
 }
 
-.page-id-353 .wp-block-post-featured-image img {
-    object-position: 0px -13px;
-}
-
-/* Link Anim - End */
-
+// Page Headings
 .page h1 {
-    background: #eee;
-    width: fit-content;
-    padding: 20px;
-    position: absolute;
-    top: -240px;
-    border-radius: 4px;
-    left: 15%;
+  background: #eee;
+  width: fit-content;
+  padding: 20px;
+  position: absolute;
+  top: -240px;
+  border-radius: 4px;
+  left: 15%;
 }
 
-@-webkit-keyframes fade-in-fwd {
-    0% {
-        -webkit-transform: translateZ(-80px);
-        transform: translateZ(-80px);
-        opacity: 0;
-    }
-    100% {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        opacity: 1;
-    }
-}
-@keyframes fade-in-fwd {
-    0% {
-        -webkit-transform: translateZ(-80px);
-        transform: translateZ(-80px);
-        opacity: 0;
-    }
-    100% {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        opacity: 1;
-    }
-}
-
-@-webkit-keyframes puff-in-center {
-    0% {
-        -webkit-transform: scale(2);
-        transform: scale(2);
-        -webkit-filter: blur(4px);
-        filter: blur(4px);
-        opacity: 0;
-    }
-    100% {
-        -webkit-transform: scale(1);
-        transform: scale(1);
-        -webkit-filter: blur(0px);
-        filter: blur(0px);
-        opacity: 1;
-    }
-}
-@keyframes puff-in-center {
-    0% {
-        -webkit-transform: scale(2);
-        transform: scale(2);
-        -webkit-filter: blur(4px);
-        filter: blur(4px);
-        opacity: 0;
-    }
-    100% {
-        -webkit-transform: scale(1);
-        transform: scale(1);
-        -webkit-filter: blur(0px);
-        filter: blur(0px);
-        opacity: 1;
-    }
-}
-
-.fade-in-fwd {
-    -webkit-animation: fade-in-fwd 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
-    animation: fade-in-fwd 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
-}
-
-.fade-in-fwd-delay {
-    -webkit-animation: fade-in-fwd 0.8s cubic-bezier(0.39, 0.575, 0.565, 1) 0.7s both;
-    animation: fade-in-fwd 0.8s cubic-bezier(0.39, 0.575, 0.565, 1) 0.7s both;
-}
-
-.puff-in-center {
-    -webkit-animation: puff-in-center 0.7s cubic-bezier(0.47, 0, 0.745, 0.715) 1.3s both;
-    animation: puff-in-center 0.7s cubic-bezier(0.47, 0, 0.745, 0.715) 1.3s both;
-}
-
-/* Card Link - Start */
+// Card Links
+// ----------------------------------------------------------------------------
 .card_link {
-    position: relative;
-    overflow: hidden;
-}
-
-.card_link > .wp-block-group {
+  position: relative;
+  overflow: hidden;
+  
+  > .wp-block-group {
     position: initial;
-}
-
-.card_link figure {
-    margin: 0; /* Remove any default margin to prevent visual shifts */
-    overflow: hidden; /* Ensures the image stays within the container when zoomed */
-    border-radius: 5px; /* Apply the border radius to the container for consistency */
-}
-
-.card_link figure img {
-    display: block; /* Ensures the image respects its container */
-    width: 100%; /* Makes the image responsive */
-    height: auto; /* Maintain aspect ratio */
-    transition: transform 0.3s ease; /* Smooth zoom effect */
-}
-
-.card_link:hover figure img {
-    transform: scale(1.1); /* Zoom in effect */
-}
-.card_link a.wp-block-post-excerpt__more-link {
+  }
+  
+  figure {
+    @include card-image-hover;
+  }
+  
+  &:hover {
+    figure img {
+      transform: scale(1.1);
+    }
+    
+    .wp-block-post-title a::before {
+      transform: scaleX(1);
+    }
+  }
+  
+  a.wp-block-post-excerpt__more-link {
     display: block;
     font-size: 0;
     height: 100%;
@@ -301,95 +225,83 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     top: 0;
     width: 100%;
     z-index: 2;
+  }
 }
 
-/* Card Link - End */
-
-.card_link:hover .wp-block-post-title a::before {
-    transform: scaleX(1); /* Trigger underline effect when the entire card is hovered */
+// Specific Page Styling
+// ----------------------------------------------------------------------------
+.page-id-353 .wp-block-post-featured-image img {
+  object-position: 0px -13px;
 }
 
-// Mobile
-
+// Mobile Styles
+// ----------------------------------------------------------------------------
 @media screen and (max-width: 600px) {
-    nav.is-responsive {
-        justify-content: center;
+  nav.is-responsive {
+    justify-content: center;
+  }
+  
+  .wp-container-core-columns-is-layout-1 {
+    gap: 10px;
+  }
+  
+  // Mobile Menu
+  header nav.wp-block-navigation .wp-block-navigation__container > .wp-block-navigation-item > .wp-block-navigation-item__content {
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+  
+  .home_cta {
+    figure {
+      padding: 0 15px;
     }
-
-    .wp-container-core-columns-is-layout-1 {
-        gap: 10px;
+    
+    .card_link > .wp-block-group {
+      width: 100%;
     }
-
-    // Mobile Menu
-    header nav.wp-block-navigation .wp-block-navigation__container > .wp-block-navigation-item > .wp-block-navigation-item__content {
-        font-weight: bold;
-        font-size: 1.1em;
+  }
+  
+  .testimonials {
+    figure {
+      margin: 0 auto;
     }
-    .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-content .has-child .wp-block-navigation__submenu-container
-{
-        
-        ul {
-            // width: 100%;
-            // align-items: center;
-        }
+    
+    h2 {
+      text-align: center;
     }
-
-    .home_cta figure {
-        padding: 0 15px 0 15px;
+    
+    li {
+      padding: 0 15px;
     }
-
-    .home_cta .card_link > .wp-block-group {
-        width: 100%;
-    }
-
-    .testimonials {
-        figure {
-            margin : 0 auto;
-        }
-        h2 {
-            text-align: center;
-        }
-        li {
-            padding: 0 15px;
-        }
-    }
-
+  }
 }
 
-
+// Mobile Navigation Menu
+// ----------------------------------------------------------------------------
 .wp-block-navigation__responsive-container-content.is-menu-open > ul {
-    width: 100%;
-    .wp-block-navigation__responsive-container-content .wp-block-navigation-item {
-        align-items: anchor-center;
+  width: 100%;
+}
+
+.wp-block-navigation__responsive-container.is-menu-open {
+  .wp-block-navigation__responsive-container-content {
+    .wp-block-navigation-item {
+      align-items: center;
     }
-}
-
-.wp-block-navigation__responsive-container.is-menu-open 
-.wp-block-navigation__responsive-container-content 
-.wp-block-navigation-item {
-    align-items: anchor-center;
-}
-
-.wp-block-navigation__responsive-container.is-menu-open 
-.wp-block-navigation__responsive-container-content 
-.wp-block-navigation__container
-{
-    width: 100%;
-    align-items: center;
-    > li {
-        a {
-            &:hover {
-                // color: #000;
-                text-decoration: none;
-            }
+    
+    .wp-block-navigation__container {
+      width: 100%;
+      align-items: center;
+      
+      > li a {
+        &:hover {
+          text-decoration: none;
         }
+      }
     }
-}
-
-
-
-.wp-block-navigation__responsive-container.is-menu-open 
-.wp-block-navigation__responsive-container-content .wp-block-navigation__submenu-container {
-    gap: 7px;
-    padding-top: 10px;
+    
+    .wp-block-navigation__submenu-container {
+      gap: 7px;
+      padding-top: 10px;
+    }
+  }
 }
