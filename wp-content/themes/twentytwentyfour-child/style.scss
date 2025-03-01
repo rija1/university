@@ -16,16 +16,61 @@ $colors: (
   'red': #b42127,
   'yellow': #f8bd3b
 );
+// $colors: (
+//   'darkblue': #d3c5e8,
+//   'blue': #7398bb,
+//   'lightblue': #a1c9d3,
+//   'red': #e58c90,
+//   'yellow': #ffd373
+// );
 
 // Mixins
 // ----------------------------------------------------------------------------
+// @mixin navigation-item($color) {
+//   border-bottom: solid 3px $color;
+//   &:hover {
+//     color: #fff;
+//     background-color: $color;
+//   }
+// }
+
 @mixin navigation-item($color) {
-  border-bottom: solid 3px $color;
-  &:hover {
-    // color: #fff
-    background-color: $color;
+    border-bottom: solid 3px $color;
+  
+    &:hover {
+      background-color: $color;
+  
+      > a { // Only affects first-level <a>
+        color: #fff;
+      }
+      svg {
+        stroke: #fff; // If your SVG uses strokes, this will change the stroke color too
+      }
+    }
+    // Styling for submenu items
+  ul {
+    // background: lighten($color, 20%); // Slightly lighter background for submenus
+    border-radius: 5px;
+    padding: 5px 0;
+
+    li {
+      &:hover {
+        background: $color; // Darker background when hovered
+      }
+
+      a {
+        color: #000; // Keep submenu links readable
+
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
   }
-}
+  }
+
+//   .wp-block-navigation__submenu-container
+  
 
 @mixin card-image-hover {
   margin: 0;
@@ -111,7 +156,7 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     }
 
     &:hover {
-      transition: 1400ms;
+      transition: 400ms;
       border: none;
       
       button {

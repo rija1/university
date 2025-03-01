@@ -105,8 +105,8 @@ header nav.wp-block-navigation .wp-block-navigation__container > li a:hover {
 }
 
 header nav.wp-block-navigation .wp-block-navigation__container > li:hover {
-  -webkit-transition: 1400ms;
-  transition: 1400ms;
+  -webkit-transition: 400ms;
+  transition: 400ms;
   border: none;
 }
 
@@ -123,12 +123,62 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(1)
   background-color: #70b7ac;
 }
 
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(1):hover > a {
+  color: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(1):hover svg {
+  stroke: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(1) ul {
+  border-radius: 5px;
+  padding: 5px 0;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(1) ul li:hover {
+  background: #70b7ac;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(1) ul li a {
+  color: #000;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(1) ul li a:hover {
+  color: #fff;
+}
+
 header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2) {
   border-bottom: solid 3px #b42127;
 }
 
 header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2):hover {
   background-color: #b42127;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2):hover > a {
+  color: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2):hover svg {
+  stroke: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2) ul {
+  border-radius: 5px;
+  padding: 5px 0;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2) ul li:hover {
+  background: #b42127;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2) ul li a {
+  color: #000;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(2) ul li a:hover {
+  color: #fff;
 }
 
 header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3) {
@@ -139,6 +189,31 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3)
   background-color: #f8bd3b;
 }
 
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3):hover > a {
+  color: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3):hover svg {
+  stroke: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3) ul {
+  border-radius: 5px;
+  padding: 5px 0;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3) ul li:hover {
+  background: #f8bd3b;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3) ul li a {
+  color: #000;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(3) ul li a:hover {
+  color: #fff;
+}
+
 header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4) {
   border-bottom: solid 3px #194b57;
 }
@@ -147,12 +222,62 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4)
   background-color: #194b57;
 }
 
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4):hover > a {
+  color: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4):hover svg {
+  stroke: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4) ul {
+  border-radius: 5px;
+  padding: 5px 0;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4) ul li:hover {
+  background: #194b57;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4) ul li a {
+  color: #000;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(4) ul li a:hover {
+  color: #fff;
+}
+
 header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5) {
   border-bottom: solid 3px #4881b6;
 }
 
 header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5):hover {
   background-color: #4881b6;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5):hover > a {
+  color: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5):hover svg {
+  stroke: #fff;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5) ul {
+  border-radius: 5px;
+  padding: 5px 0;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5) ul li:hover {
+  background: #4881b6;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5) ul li a {
+  color: #000;
+}
+
+header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5) ul li a:hover {
+  color: #fff;
 }
 
 .home_cta {
