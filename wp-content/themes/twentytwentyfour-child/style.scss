@@ -10,11 +10,11 @@ Text Domain:  twentytwentyfour
 // Variables
 // ----------------------------------------------------------------------------
 $colors: (
-  'darkblue': #194b57,
-  'blue': #4881b6,
-  'lightblue': #70b7ac,
-  'red': #b42127,
-  'yellow': #f8bd3b
+    "darkblue": #194b57,
+    "blue": #4881b6,
+    "lightblue": #70b7ac,
+    "red": #b42127,
+    "yellow": #f8bd3b
 );
 // $colors: (
 //   'darkblue': #d3c5e8,
@@ -36,304 +36,321 @@ $colors: (
 
 @mixin navigation-item($color) {
     border-bottom: solid 3px $color;
-  
+
     &:hover {
-      background-color: $color;
-  
-      > a { // Only affects first-level <a>
-        color: #fff;
-      }
-      svg {
-        stroke: #fff; // If your SVG uses strokes, this will change the stroke color too
-      }
+        background-color: $color;
+
+        > a {
+            // Only affects first-level <a>
+            color: #fff;
+        }
+        svg {
+            stroke: #fff; // If your SVG uses strokes, this will change the stroke color too
+        }
     }
     // Styling for submenu items
-  ul {
-    // background: lighten($color, 20%); // Slightly lighter background for submenus
-    border-radius: 5px;
-    padding: 5px 0;
+    ul {
+        // background: lighten($color, 20%); // Slightly lighter background for submenus
+        border-radius: 5px;
+        padding: 5px 0;
 
-    li {
-      &:hover {
-        background: $color; // Darker background when hovered
-      }
+        li {
+            &:hover {
+                background: $color; // Darker background when hovered
+            }
 
-      a {
-        color: #000; // Keep submenu links readable
+            a {
+                color: #000; // Keep submenu links readable
 
-        &:hover {
-          color: #fff;
+                &:hover {
+                    color: #fff;
+                }
+            }
         }
-      }
     }
-  }
-  }
+}
 
 //   .wp-block-navigation__submenu-container
-  
 
 @mixin card-image-hover {
-  margin: 0;
-  overflow: hidden;
-  border-radius: 5px;
+    margin: 0;
+    overflow: hidden;
 
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-    transition: transform 0.3s ease;
-  }
+    img {
+        display: block;
+        width: 100%;
+        height: auto;
+        transition: transform 0.3s ease;
+    }
 }
 
 // Font Declarations
 // ----------------------------------------------------------------------------
 @font-face {
-  font-family: "FontAwesome";
-  src: url("fonts/fa-solid-900.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
+    font-family: "FontAwesome";
+    src: url("fonts/fa-solid-900.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
 }
 
 // Animations
 // ----------------------------------------------------------------------------
 @keyframes fade-in-fwd {
-  0% {
-    transform: translateZ(-80px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateZ(0);
-    opacity: 1;
-  }
+    0% {
+        transform: translateZ(-80px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateZ(0);
+        opacity: 1;
+    }
 }
 
 @keyframes puff-in-center {
-  0% {
-    transform: scale(2);
-    filter: blur(4px);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    filter: blur(0px);
-    opacity: 1;
-  }
+    0% {
+        transform: scale(2);
+        filter: blur(4px);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        filter: blur(0px);
+        opacity: 1;
+    }
 }
 
 // Animation Classes
 .fade-in-fwd {
-  animation: fade-in-fwd 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+    animation: fade-in-fwd 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
 }
 
 .fade-in-fwd-delay {
-  animation: fade-in-fwd 0.8s cubic-bezier(0.39, 0.575, 0.565, 1) 0.7s both;
+    animation: fade-in-fwd 0.8s cubic-bezier(0.39, 0.575, 0.565, 1) 0.7s both;
 }
 
 .puff-in-center {
-  animation: puff-in-center 0.7s cubic-bezier(0.47, 0, 0.745, 0.715) 1.3s both;
+    animation: puff-in-center 0.7s cubic-bezier(0.47, 0, 0.745, 0.715) 1.3s both;
 }
-
 
 // Layout Components
 // ----------------------------------------------------------------------------
 
 // Header
 .header_hero_group {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
 }
 
 // Navigation
 header nav.wp-block-navigation .wp-block-navigation__container {
-  > li {
-    padding: 10px 15px;
+    > li {
+        padding: 10px 15px;
 
-    a {
-      &:hover {
-        text-decoration: none;
-      }
+        a {
+            &:hover {
+                text-decoration: none;
+            }
+        }
+
+        &:hover {
+            transition: 400ms;
+            border: none;
+
+            button {
+                transition: 1400ms;
+            }
+        }
     }
 
-    &:hover {
-      transition: 400ms;
-      border: none;
-      
-      button {
-        transition: 1400ms;
-      }
+    // Colored navigation items
+    > li:nth-child(1) {
+        @include navigation-item(map-get($colors, "lightblue"));
     }
-  }
-
-  // Colored navigation items
-  > li:nth-child(1) { @include navigation-item(map-get($colors, 'lightblue')); }
-  > li:nth-child(2) { @include navigation-item(map-get($colors, 'red')); }
-  > li:nth-child(3) { @include navigation-item(map-get($colors, 'yellow')); }
-  > li:nth-child(4) { @include navigation-item(map-get($colors, 'darkblue')); }
-  > li:nth-child(5) { @include navigation-item(map-get($colors, 'blue')); }
+    > li:nth-child(2) {
+        @include navigation-item(map-get($colors, "red"));
+    }
+    > li:nth-child(3) {
+        @include navigation-item(map-get($colors, "yellow"));
+    }
+    > li:nth-child(4) {
+        @include navigation-item(map-get($colors, "darkblue"));
+    }
+    > li:nth-child(5) {
+        @include navigation-item(map-get($colors, "blue"));
+    }
 }
 
 // Homepage CTAs
 // ----------------------------------------------------------------------------
 .home_cta {
-  position: relative;
-  
-  h2 {
-    text-align: center;
-    
-    &::before {
-      font-family: "FontAwesome";
-      font-size: 38px;
-      content: "";
-      padding-right: 30px;
+    position: relative;
+
+    h2 {
+        text-align: center;
+
+        &::before {
+            font-family: "FontAwesome";
+            font-size: 38px;
+            content: "";
+            padding-right: 30px;
+        }
     }
-  }
 }
 
 // CTA Icons
-.home_cta_1 h2::before { content: "\f19c"; }
-.home_cta_2 h2::before { content: "\f19d"; }
-.home_cta_3 h2::before { content: "\f655"; }
-.home_cta_4 h2::before { content: "\f1ce"; }
+.home_cta_1 h2::before {
+    content: "\f19c";
+}
+.home_cta_2 h2::before {
+    content: "\f19d";
+}
+.home_cta_3 h2::before {
+    content: "\f655";
+}
+.home_cta_4 h2::before {
+    content: "\f1ce";
+}
 
 // Links & Titles
 // ----------------------------------------------------------------------------
 
 .wp-block-post-title a {
-
     display: inline;
     position: relative;
     text-decoration: none;
-    background:linear-gradient(#b30606,#000) left bottom no-repeat;
-    background-size:0% 2px;
-    transition: all 0.5s;   
-  }
+    background: linear-gradient(#b30606, #000) left bottom no-repeat;
+    background-size: 0% 2px;
+    transition: all 0.5s;
+}
 
 // Page Headings
 .page h1 {
-  background: #eee;
-  width: fit-content;
-  padding: 20px;
-  position: absolute;
-  top: -240px;
-  border-radius: 4px;
-  left: 15%;
+    background: #eee;
+    width: fit-content;
+    padding: 20px;
+    position: absolute;
+    top: -240px;
+    border-radius: 4px;
+    left: 15%;
 }
 
 // Card Links
 // ----------------------------------------------------------------------------
 .card_link {
-  position: relative;
-  overflow: hidden;
-  
-  > .wp-block-group {
-    position: initial;
-  }
-  
-  figure {
-    @include card-image-hover;
-  }
-  
-  &:hover {
-    figure img {
-      transform: scale(1.1);
-    }
-    
-    .wp-block-post-title a::before {
-      transform: scaleX(1);
+    position: relative;
+    overflow: hidden;
+
+    > .wp-block-group {
+        position: initial;
     }
 
-    .wp-block-post-title a {
-        background-size:100% 2px;
+    figure {
+        @include card-image-hover;
     }
-  }
-  
-  a.wp-block-post-excerpt__more-link {
-    display: block;
-    font-size: 0;
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 2;
-  }
+
+    &:hover {
+        figure img {
+            transform: scale(1.1);
+        }
+
+        .wp-block-post-title a::before {
+            transform: scaleX(1);
+        }
+
+        .wp-block-post-title a {
+            background-size: 100% 2px;
+        }
+    }
+
+    a.wp-block-post-excerpt__more-link {
+        display: none;
+        // font-size: 0;
+        // height: 100%;
+        // left: 0;
+        // position: absolute;
+        // top: 0;
+        // width: 100%;
+        // z-index: 2;
+    }
 }
 
 // Specific Page Styling
 // ----------------------------------------------------------------------------
 .page-id-353 .wp-block-post-featured-image img {
-  object-position: 0px -13px;
+    object-position: 0px -13px;
 }
 
 // Mobile Styles
 // ----------------------------------------------------------------------------
 @media screen and (max-width: 600px) {
-  nav.is-responsive {
-    justify-content: center;
-  }
-  
-  .wp-container-core-columns-is-layout-1 {
-    gap: 10px;
-  }
-  
-  // Mobile Menu
-  header nav.wp-block-navigation .wp-block-navigation__container > .wp-block-navigation-item > .wp-block-navigation-item__content {
-    font-weight: bold;
-    font-size: 1.1em;
-  }
-  
-  .home_cta {
-    figure {
-      padding: 0 15px;
+    nav.is-responsive {
+        justify-content: center;
     }
-    
-    .card_link > .wp-block-group {
-      width: 100%;
+
+    .wp-container-core-columns-is-layout-1 {
+        gap: 10px;
     }
-  }
-  
-  .testimonials {
-    figure {
-      margin: 0 auto;
+
+    .card_link {
+        padding: 15px;
+        a.wp-block-post-excerpt__more-link {
+            display: block;
+        }
     }
-    
-    h2 {
-      text-align: center;
+
+    // Mobile Menu
+    header
+        nav.wp-block-navigation
+        .wp-block-navigation__container
+        > .wp-block-navigation-item
+        > .wp-block-navigation-item__content {
+        font-weight: bold;
+        font-size: 1.1em;
     }
-    
-    li {
-      padding: 0 15px;
+
+
+    .testimonials {
+        figure {
+            margin: 0 auto;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        li {
+            padding: 0 15px;
+        }
     }
-  }
 }
 
 // Mobile Navigation Menu
 // ----------------------------------------------------------------------------
 .wp-block-navigation__responsive-container-content.is-menu-open > ul {
-  width: 100%;
+    width: 100%;
 }
 
 .wp-block-navigation__responsive-container.is-menu-open {
-  .wp-block-navigation__responsive-container-content {
-    .wp-block-navigation-item {
-      align-items: center;
-    }
-    
-    .wp-block-navigation__container {
-      width: 100%;
-      align-items: center;
-      
-      > li a {
-        &:hover {
-          text-decoration: none;
+    .wp-block-navigation__responsive-container-content {
+        .wp-block-navigation-item {
+            align-items: center;
         }
-      }
+
+        .wp-block-navigation__container {
+            width: 100%;
+            align-items: center;
+
+            > li a {
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .wp-block-navigation__submenu-container {
+            gap: 7px;
+            padding-top: 10px;
+        }
     }
-    
-    .wp-block-navigation__submenu-container {
-      gap: 7px;
-      padding-top: 10px;
-    }
-  }
 }

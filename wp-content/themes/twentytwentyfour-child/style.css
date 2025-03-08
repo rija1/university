@@ -346,7 +346,6 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
 .card_link figure {
   margin: 0;
   overflow: hidden;
-  border-radius: 5px;
 }
 
 .card_link figure img {
@@ -374,14 +373,7 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
 }
 
 .card_link a.wp-block-post-excerpt__more-link {
-  display: block;
-  font-size: 0;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 2;
+  display: none;
 }
 
 .page-id-353 .wp-block-post-featured-image img {
@@ -398,15 +390,19 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
   .wp-container-core-columns-is-layout-1 {
     gap: 10px;
   }
-  header nav.wp-block-navigation .wp-block-navigation__container > .wp-block-navigation-item > .wp-block-navigation-item__content {
+  .card_link {
+    padding: 15px;
+  }
+  .card_link a.wp-block-post-excerpt__more-link {
+    display: block;
+  }
+  header
+nav.wp-block-navigation
+.wp-block-navigation__container
+> .wp-block-navigation-item
+> .wp-block-navigation-item__content {
     font-weight: bold;
     font-size: 1.1em;
-  }
-  .home_cta figure {
-    padding: 0 15px;
-  }
-  .home_cta .card_link > .wp-block-group {
-    width: 100%;
   }
   .testimonials figure {
     margin: 0 auto;
