@@ -382,6 +382,9 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
 }
 
 @media screen and (max-width: 600px) {
+  main.wp-block-group {
+    padding: 0 15px;
+  }
   nav.is-responsive {
     -webkit-box-pack: center;
         -ms-flex-pack: center;
@@ -389,9 +392,6 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
   }
   .wp-container-core-columns-is-layout-1 {
     gap: 10px;
-  }
-  .card_link {
-    padding: 15px;
   }
   .card_link a.wp-block-post-excerpt__more-link {
     display: block;

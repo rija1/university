@@ -284,6 +284,11 @@ header nav.wp-block-navigation .wp-block-navigation__container {
 // Mobile Styles
 // ----------------------------------------------------------------------------
 @media screen and (max-width: 600px) {
+
+    main.wp-block-group {
+        padding: 0 15px;
+    } 
+
     nav.is-responsive {
         justify-content: center;
     }
@@ -293,7 +298,6 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     }
 
     .card_link {
-        padding: 15px;
         a.wp-block-post-excerpt__more-link {
             display: block;
         }
