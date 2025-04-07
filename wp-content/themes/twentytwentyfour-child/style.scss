@@ -249,29 +249,15 @@ header nav.wp-block-navigation .wp-block-navigation__container {
         @include card-image-hover;
     }
 
-    &:hover {
-        figure img {
-            transform: scale(1.1);
-        }
-
-        .wp-block-post-title a::before {
-            transform: scaleX(1);
-        }
-
-        .wp-block-post-title a {
-            background-size: 100% 2px;
-        }
-    }
-
     a.wp-block-post-excerpt__more-link {
-        display: none;
-        // font-size: 0;
-        // height: 100%;
-        // left: 0;
-        // position: absolute;
-        // top: 0;
-        // width: 100%;
-        // z-index: 2;
+        // display: none;
+        font-size: 0;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 2;
     }
 }
 
@@ -279,6 +265,28 @@ header nav.wp-block-navigation .wp-block-navigation__container {
 // ----------------------------------------------------------------------------
 .page-id-353 .wp-block-post-featured-image img {
     object-position: 0px -13px;
+}
+
+/* Desktop-only media query */
+@media screen and (min-width: 1024px) {   
+    .card_link {
+        &:hover {
+
+
+
+            figure img {
+                transform: scale(1.1);
+            }
+    
+            .wp-block-post-title a::before {
+                transform: scale(1.5);
+            }
+    
+            .wp-block-post-title a {
+                background-size: 100% 2px;
+            }
+        }
+  }
 }
 
 // Mobile Styles
@@ -324,6 +332,17 @@ header nav.wp-block-navigation .wp-block-navigation__container {
         }
 
         li {
+            padding: 0 15px;
+        }
+    }
+
+    .home_testimonials {
+        .wp-block-post-featured-image {
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 20px;
+        }
+        h2 {
             padding: 0 15px;
         }
     }
