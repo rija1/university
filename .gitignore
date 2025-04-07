@@ -1,4 +1,4 @@
-# Wordpress - ignore core, configuration, examples, uploads and logs.
+	# Wordpress - ignore core, configuration, examples, uploads and logs.
 # https://github.com/github/gitignore/blob/main/WordPress.gitignore
 
 # Core
@@ -49,3 +49,4 @@ wp-config.php
 # uncomment the next line
 #/wp-content/themes
 *.wpress
+/wp-content/ewww/image-backup/uploads
