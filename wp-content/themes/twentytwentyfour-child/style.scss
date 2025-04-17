@@ -267,14 +267,15 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     }
 }
 
-// Specific Page Styling
-// ----------------------------------------------------------------------------
-.page-id-353 .wp-block-post-featured-image img {
-    object-position: 0px -13px;
-}
-
 /* Desktop-only media query */
 @media screen and (min-width: 1024px) {   
+
+    // Specific Page Styling
+    // ----------------------------------------------------------------------------
+    .page-id-353 .wp-block-post-featured-image img {
+        object-position: 0px -13px;
+    }
+
     .card_link {
         &:hover {
 
@@ -301,7 +302,9 @@ header nav.wp-block-navigation .wp-block-navigation__container {
 
     .feat_img_title_block {
         figure {
-            margin-bottom:0 !important
+            margin-bottom:0 !important;
+            height: 200px !important;
+            
         }
     }
 

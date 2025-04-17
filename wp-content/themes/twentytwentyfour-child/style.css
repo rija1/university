@@ -372,13 +372,12 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
   z-index: 2;
 }
 
-.page-id-353 .wp-block-post-featured-image img {
-  -o-object-position: 0px -13px;
-     object-position: 0px -13px;
-}
-
 /* Desktop-only media query */
 @media screen and (min-width: 1024px) {
+  .page-id-353 .wp-block-post-featured-image img {
+    -o-object-position: 0px -13px;
+       object-position: 0px -13px;
+  }
   .card_link:hover figure img {
     -webkit-transform: scale(1.1);
             transform: scale(1.1);
@@ -395,6 +394,7 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
 @media screen and (max-width: 600px) {
   .feat_img_title_block figure {
     margin-bottom: 0 !important;
+    height: 200px !important;
   }
   .page h1 {
     position: static;
