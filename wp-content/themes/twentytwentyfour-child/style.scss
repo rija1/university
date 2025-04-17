@@ -142,6 +142,12 @@ $colors: (
     height: 100vh;
 }
 
+// Title
+
+.feat_img_title_block {
+    position: relative;
+}
+
 // Navigation
 header nav.wp-block-navigation .wp-block-navigation__container {
     > li {
@@ -230,9 +236,9 @@ header nav.wp-block-navigation .wp-block-navigation__container {
     width: fit-content;
     padding: 20px;
     position: absolute;
-    top: -240px;
+    bottom: 40px;
     border-radius: 4px;
-    left: 15%;
+    left: 180px;
 }
 
 // Card Links
@@ -292,6 +298,22 @@ header nav.wp-block-navigation .wp-block-navigation__container {
 // Mobile Styles
 // ----------------------------------------------------------------------------
 @media screen and (max-width: 600px) {
+
+    .feat_img_title_block {
+        figure {
+            margin-bottom:0 !important
+        }
+    }
+
+    .page h1 {
+        position: static;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        background: #eee;
+        border-radius: 0;
+    }
 
     main.wp-block-group {
         padding: 0 15px;
