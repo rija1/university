@@ -406,7 +406,7 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
     border-radius: 0;
   }
   main.wp-block-group {
-    padding: 0 15px;
+    padding: 40px 15px;
   }
   nav.is-responsive {
     -webkit-box-pack: center;
