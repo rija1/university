@@ -3,7 +3,7 @@ Contributors: wpforms, jaredatch, smub, slaFFik
 Tags: contact form, contact form plugin, forms, form builder, custom form
 Requires at least: 5.5
 Tested up to: 6.7
-Stable tag: 1.9.3.2
+Stable tag: 1.9.4.2
 Requires PHP: 7.1
 License: GNU General Public License v2.0 or later
 
@@ -99,6 +99,7 @@ We also know that our developer friends may want more control, so we added tons 
 * [Form templates](https://wpforms.com/templates/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) pre-built and ready to import.
 * [Form styling](https://wpforms.com/docs/styling-your-forms/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) for fields, labels, and buttons.
 * [Spam protection](https://wpforms.com/features/spam-protection/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) built in, plus integrations with hCaptcha, Google reCAPTCHA, and Cloudflare Turnstile.
+* [AI Forms](https://wpforms.com/features/wpforms-ai/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) to automatically create and refine forms through natural conversation.
 * [Instant form notifications](https://wpforms.com/features/instant-notifications/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) via email.
 * [Custom form confirmations](https://wpforms.com/features/form-confirmation/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) with success messages or thank you pages.
 * [Smart phone field](https://wpforms.com/docs/how-to-choose-the-right-form-field-for-your-forms/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin#phone) that adapts to your visitor's location.
@@ -378,6 +379,37 @@ Thank you,
 Syed Balkhi
 
 == Changelog ==
+
+= 1.9.4.2 =
+- Fixed: Fatal error when trying to delete the plugin.
+- Fixed: Character encoding issues in Email notifications when viewed on some Apple devices.
+
+= 1.9.4.1 =
+- Added: Minimum and maximum value validation for the Numbers field.
+- Added: Implemented password protection and user access restrictions for uploaded files.
+- Added: Automatic preview page reload was added after saving.
+- Changed: Improved Gutenberg block UI by hiding settings when no form is selected.
+- Changed: Updated stripe/stripe-php library to 16.5.0.
+- Changed: Enhanced Tools > Scheduled Actions visibility for better compatibility with Action Scheduler, WooCommerce, and WP Rocket plugins.
+- Changed: Improved Stripe payments customer address handling.
+- Changed: Optimized number slider calculations for better decimal precision.
+- Changed: Improved Numbers and Number Slider fields settings interface in the form builder.
+- Fixed: Stripe Credit Card field payment element console warnings.
+- Fixed: Resolved form submission debug log warnings.
+- Fixed: URL referer smart tag functionality for external websites.
+- Fixed: Addressed GDPR enhancements setting flashings on refresh.
+- Fixed: Resolved Stripe payments processing for Indian accounts.
+- Fixed: Corrected Payments Summary chart tooltip display.
+- Fixed: Improved decimal precision in number slider field calculations.
+- Fixed: Enhanced WPForms admin pages performance.
+- Fixed: Backslash handling in form data after saving.
+- Fixed: Prevented duplicate entry submissions with reCAPTCHA v3.
+- Fixed: Restored missing Order Summary item names for hidden label fields.
+- Fixed: Improved Order Summary performance with conditional Multiple Items fields.
+- Fixed: Dynamic Choice fields button behavior.
+- Fixed: Display of zero-price Payment Checkbox items.
+- Fixed: Stripe Credit Card field styling in Divi builder.
+- Fixed: Fatal error with a custom country address scheme.
 
 = 1.9.3.2 =
 - Fixed: GDPR enhancements sub-setting briefly flashed on the WPForms > Settings admin page after refresh.

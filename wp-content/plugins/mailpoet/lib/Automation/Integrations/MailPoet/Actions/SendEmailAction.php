@@ -65,6 +65,7 @@ class SendEmailAction implements Action {
   private const OPTIN_RETRIES = 'optin_retries';
 
   private const TRANSACTIONAL_TRIGGERS = [
+    'mailpoet:custom-trigger',
     'woocommerce:order-status-changed',
     'woocommerce:order-created',
     'woocommerce:order-completed',
@@ -425,7 +426,7 @@ class SendEmailAction implements Action {
     $this->newslettersRepository->flush();
   }
 
-  private function storeNewsletterOption(NewsletterEntity $newsletter, string $optionName, string $optionValue = null): void {
+  private function storeNewsletterOption(NewsletterEntity $newsletter, string $optionName, ?string $optionValue = null): void {
     $options = $newsletter->getOptions()->toArray();
     foreach ($options as $key => $option) {
       if ($option->getName() === $optionName) {
