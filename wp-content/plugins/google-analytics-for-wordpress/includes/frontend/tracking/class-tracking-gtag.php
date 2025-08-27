@@ -212,6 +212,9 @@ class MonsterInsights_Tracking_Gtag extends MonsterInsights_Tracking_Abstract {
 				var mi_no_track_reason = <?php echo $reason ? "'" . esc_js( $reason ) . "'" : "''"; ?>;
 				<?php do_action( 'monsterinsights_tracking_gtag_frontend_output_after_mi_track_user' ); ?>
 				var MonsterInsightsDefaultLocations = <?php echo $this->get_default_locations(); // phpcs:ignore -- JSON ?>;
+				<?php if ( $this->is_utm_stripped_server() ) : ?>
+				MonsterInsightsDefaultLocations.page_location = window.location.href;
+				<?php endif; ?>
 				if ( typeof MonsterInsightsPrivacyGuardFilter === 'function' ) {
 					var MonsterInsightsLocations = (typeof MonsterInsightsExcludeQuery === 'object') ? MonsterInsightsPrivacyGuardFilter( MonsterInsightsExcludeQuery ) : MonsterInsightsPrivacyGuardFilter( MonsterInsightsDefaultLocations );
 				} else {
@@ -315,15 +318,6 @@ class MonsterInsights_Tracking_Gtag extends MonsterInsights_Tracking_Abstract {
 					<?php if (! empty( $v4_id )) { ?>
 					__gtagTracker('config', '<?php echo esc_js( $v4_id ); ?>', <?php echo $options_v4; // phpcs:ignore ?> );
 					<?php } ?>
-					<?php
-					/*
-					 * Extend or enhance the functionality by adding custom code to frontend
-					 * tracking via this hook.
-					 *
-					 * @since 7.15.0
-					 */
-					do_action( 'monsterinsights_frontend_tracking_gtag_after_pageview' );
-					?>
 					<?php echo esc_js( $compat ); ?>
 					<?php if (apply_filters( 'monsterinsights_tracking_gtag_frontend_gatracker_compatibility', true )) { ?>
 					(function () {
@@ -451,6 +445,58 @@ class MonsterInsights_Tracking_Gtag extends MonsterInsights_Tracking_Abstract {
 					<?php } ?>
 				}
 			</script>
+			
+			<?php
+			/*
+			 * New separate script tags for conversion tracking and other post-pageview actions
+			 * Each hook will create its own script tag for better separation and debugging
+			 *
+			 * @since 9.6.2
+			 */
+			
+			// Get all actions hooked to this action
+			global $wp_filter;
+			$hook_name = 'monsterinsights_frontend_tracking_gtag_after_pageview';
+			
+			if ( isset( $wp_filter[ $hook_name ] ) ) {
+				$callbacks = $wp_filter[ $hook_name ]->callbacks;
+				
+				// Sort by priority
+				ksort( $callbacks );
+				
+				foreach ( $callbacks as $priority => $priority_callbacks ) {
+					foreach ( $priority_callbacks as $callback_key => $callback_data ) {
+						// Capture output for this specific callback
+						ob_start();
+						
+						// Execute this specific callback
+						if ( is_array( $callback_data['function'] ) ) {
+							// Class method
+							if ( is_object( $callback_data['function'][0] ) ) {
+								call_user_func( $callback_data['function'] );
+							} else {
+								// Static method
+								call_user_func( $callback_data['function'] );
+							}
+						} else {
+							// Function
+							call_user_func( $callback_data['function'] );
+						}
+						
+						$callback_output = ob_get_clean();
+						
+						// Only create script tag if there's output
+						if ( ! empty( trim( $callback_output ) ) ) {
+							?>
+							<script<?php echo $attr_string; // phpcs:ignore ?>>
+								<?php echo $callback_output; // phpcs:ignore ?>
+							</script>
+							<?php
+						}
+					}
+				}
+			}
+			?>
 		<?php } else { ?>
 			<!-- No tracking code set -->
 		<?php } ?>
@@ -479,5 +525,21 @@ class MonsterInsights_Tracking_Gtag extends MonsterInsights_Tracking_Abstract {
 		}
 
 		return wp_json_encode( $urls );
+	}
+
+	/**
+	 * Check the server is among them who stripped utm parameters.
+	 * For this kind of server we will get page URL from JS.
+	 *
+	 * @return bool
+	 */
+	private function is_utm_stripped_server() {
+
+		// Is WP Engine server.
+		if ( isset( $_SERVER['IS_WPE'] ) && $_SERVER['IS_WPE'] ) {
+			return true;
+		}
+
+		return false;
 	}
 }

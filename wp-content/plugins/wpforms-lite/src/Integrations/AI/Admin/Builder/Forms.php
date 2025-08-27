@@ -244,7 +244,7 @@ class Forms {
 			'title'               => esc_html__( 'Generate a Form', 'wpforms-lite' ),
 			'description'         => esc_html__( 'Describe the form you would like to create or use one of the example prompts below to get started.', 'wpforms-lite' ),
 			'descrEndDot'         => '',
-			'learnMore'           => esc_html__( 'Learn more about WPForms AI', 'wpforms-lite' ),
+			'learnMore'           => esc_html__( 'Learn More About WPForms AI', 'wpforms-lite' ),
 			'learnMoreUrl'        => wpforms_utm_link( 'https://wpforms.com/features/wpforms-ai/', 'Builder - Settings', 'Learn more - AI Forms' . $for_lite ),
 			'inactiveAnswerTitle' => esc_html__( 'Go back to this version of the form', 'wpforms-lite' ),
 			'useForm'             => esc_html__( 'Use This Form', 'wpforms-lite' ),
@@ -352,7 +352,7 @@ class Forms {
      *
      * @return array
      */
-    private function get_required_addons_data(): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+    private function get_required_addons_data(): array {
 
 		// The addon installation procedure has floating issues in PHP < 7.4.
 		// It's better to skip the installation in this case to avoid addon installation errors.

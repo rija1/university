@@ -1,7 +1,7 @@
 <?php
 
 class Meow_MGL_Migrations {
-    private $db_version = '1.0';
+    private $db_version = '1.5';
     private $core;
 
     public function __construct( $core ) {
@@ -32,6 +32,8 @@ class Meow_MGL_Migrations {
             description text,
             layout varchar( 50 ) NOT NULL,
             medias longtext,
+            lead_image_id varchar( 20 ) DEFAULT NULL,
+            order_by varchar( 20 ) DEFAULT NULL,
             is_post_mode tinyint( 1 ) DEFAULT 0,
             is_hero_mode tinyint( 1 ) DEFAULT 0,
             posts longtext,
@@ -45,7 +47,6 @@ class Meow_MGL_Migrations {
 
         // Create collections table
         $table_name = $wpdb->prefix . 'mgl_collections';
-        
         $sql = "CREATE TABLE $table_name (
             id varchar( 20 ) NOT NULL,
             name varchar( 255 ) NOT NULL,
@@ -58,6 +59,7 @@ class Meow_MGL_Migrations {
         ) $charset_collate;";
 
         dbDelta( $sql );
+        
 
         // Migrate existing data from options to tables
         if ( version_compare( $current_version, '1.0', '<' ) ) {
@@ -85,6 +87,8 @@ class Meow_MGL_Migrations {
                     'description' => $shortcode['description'] ?? '',
                     'layout' => $shortcode['layout'],
                     'medias' => serialize( $shortcode['medias'] ),
+                    'lead_image_id' => $shortcode['lead_image_id'] ?? null,
+                    'order_by' => $shortcode['order_by'] ?? null,
                     'is_post_mode' => ( isset( $shortcode['is_post_mode'] ) && $shortcode['is_post_mode'] ) ? 1 : 0,
                     'is_hero_mode' => isset( $shortcode['hero'] ) && $shortcode['hero'] ? 1 : 0,
                     'posts' => isset( $shortcode['posts'] ) ? serialize( $shortcode['posts'] ) : null,

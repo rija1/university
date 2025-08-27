@@ -52,7 +52,7 @@ function wpforms_save_form() {
 	$data['settings']['form_tags'] = wp_list_pluck( $form_tags, 'label' );
 
 	// Update form data.
-	$form_id = wpforms()->obj( 'form' )->update( $data['id'], $data, [ 'context' => 'save_form' ] );
+	$form_id = (int) wpforms()->obj( 'form' )->update( $data['id'], $data, [ 'context' => 'save_form' ] );
 
 	/**
 	 * Fires after updating form data.
@@ -163,7 +163,7 @@ function wpforms_prepare_form_data( $form_post ): array {
  *
  * @since 1.0.0
  */
-function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
@@ -497,7 +497,7 @@ add_action( 'wp_ajax_wpforms_builder_dynamic_choices', 'wpforms_builder_dynamic_
  *
  * @since 1.2.8
  */
-function wpforms_builder_dynamic_source() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+function wpforms_builder_dynamic_source() {
 
 	// Run a security check.
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
@@ -781,7 +781,7 @@ add_action( 'wp_ajax_wpforms_activate_addon', 'wpforms_activate_addon' );
  *
  * @noinspection HtmlUnknownTarget
  */
-function wpforms_install_addon() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+function wpforms_install_addon() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 	// Run a security check.
 	check_ajax_referer( 'wpforms-admin', 'nonce' );
@@ -853,13 +853,11 @@ function wpforms_install_addon() { // phpcs:ignore Generic.Metrics.CyclomaticCom
 	 * We do not need any extra credentials if we have gotten this far, so let's install the plugin.
 	 */
 
-	require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-install-skin.php';
-
 	// Do not allow WordPress to search/download translations, as this will break JS output.
 	remove_action( 'upgrader_process_complete', [ 'Language_Pack_Upgrader', 'async_upgrade' ], 20 );
 
 	// Create the plugin upgrader with our custom skin.
-	$installer = new WPForms\Helpers\PluginSilentUpgrader( new WPForms_Install_Skin() );
+	$installer = new WPForms\Helpers\PluginSilentUpgrader( new WP_Ajax_Upgrader_Skin() );
 
 	// Error check.
 	if ( ! method_exists( $installer, 'install' ) ) {

@@ -72,10 +72,10 @@ class InvoiceCreated extends Base {
 	 *
 	 * @return int|false
 	 */
-	private function insert_renewal( $original_subscription ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function insert_renewal( $original_subscription ) {
 
 		$currency = strtoupper( $this->data->object->currency );
-		$amount   = $this->data->object->amount_due / Helpers::get_decimals_amount( $currency );
+		$amount   = $this->data->object->amount_due / wpforms_get_currency_multiplier( $currency );
 
 		return wpforms()->obj( 'payment' )->add(
 			[

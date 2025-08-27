@@ -4,7 +4,7 @@
 **Requires at least:** 6.2  
 **Tested up to:** 6.8  
 **Requires PHP:** 5.6  
-**Stable tag:** 3.0.11  
+**Stable tag:** 3.1.1  
 **License:** GPLv3  
 **License URI:** https://www.gnu.org/licenses/gpl-3.0.en.html  
 
@@ -365,9 +365,10 @@ The Patterns have been designed to make it easier for you to build your site usi
 
 ## Changelog ##
 
-##### [Version 3.0.11](https://github.com/Codeinwp/otter-blocks/compare/v3.0.10...v3.0.11) (2025-04-16)
+##### [Version 3.1.1](https://github.com/Codeinwp/otter-blocks/compare/v3.1.0...v3.1.1) (2025-08-11)
 
-- Updated dependencies
+- Fixed media upload UI in modal view
+- Enhanced security
 
 
 

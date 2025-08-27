@@ -1,5 +1,8 @@
 <?php
 
+// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+/** @noinspection AutoloadingIssuesInspection */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -18,7 +21,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	 *
 	 * @var string
 	 */
-	const CHECKBOX_META_KEY = 'wpforms_iif_checkboxes';
+	private const CHECKBOX_META_KEY = 'wpforms_iif_checkboxes';
 
 	/**
 	 * Class initialization method.
@@ -130,7 +133,12 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	 */
 	public function field_preview( $field ) {
 
-		echo '<div class="internal-information-wrap wpforms-clear">';
+		$class = wpforms_sanitize_classes( $field['class'] ?? '' );
+
+		printf(
+			'<div class="internal-information-wrap wpforms-clear %s">',
+			esc_attr( $class )
+		);
 
 			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo wpforms_render( 'fields/internal-information/icon-lightbulb' );
@@ -140,6 +148,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 				$this->render_preview( 'heading', $field );
 				$this->render_preview( 'description', $field );
 				$this->render_preview( 'expanded-description', $field );
+				$this->render_preview( 'addon', $field );
 
 				if ( $this->is_button_displayable( $field ) ) {
 					echo '<div class="wpforms-field-internal-information-row wpforms-field-internal-information-row-cta-button">';
@@ -153,7 +162,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Checks if button is displayable.
+	 * Checks if the button is displayable.
 	 *
 	 * @since 1.7.6
 	 *
@@ -374,7 +383,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Add CSS class to hide field settings when field is not editable.
+	 * Add a CSS class to hide field settings when the field is not editable.
 	 *
 	 * @since 1.7.6
 	 *
@@ -399,7 +408,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Render custom option preview on the right side of builder.
+	 * Render a custom option preview on the right side of the builder.
 	 *
 	 * @since 1.7.6
 	 *
@@ -410,7 +419,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	 * @return string
 	 * @noinspection HtmlUnknownTarget
 	 */
-	private function render_custom_preview( $option, $field, $args = [] ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded, Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function render_custom_preview( $option, $field, $args = [] ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$class        = ! empty( $args['class'] ) ? wpforms_sanitize_classes( $args['class'] ) : '';
 		$allowed_tags = $this->get_allowed_tags();
@@ -461,13 +470,20 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 				}
 
 				return sprintf( '<div class="cta-button cta-link-external %s"><a href="" target="_blank" rel="noopener noreferrer" class="hidden"><span class="button-label"></span></a></div>', esc_attr( $class ) );
+
+			case 'addon':
+				if ( empty( $field['addon'] ) ) {
+					return '';
+				}
+
+				return sprintf( '<input type="hidden" name="fields[%1$s][addon]" value="%2$s">', esc_attr( $field['id'] ), esc_attr( $field['addon'] ) );
 		}
 
 		return '';
 	}
 
 	/**
-	 * Display field button in the left panel only if the field is editable.
+	 * Display the field button in the left panel only if the field is editable.
 	 *
 	 * @since 1.7.6
 	 *
@@ -509,7 +525,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Add internal information field to the list of ignored fields for entry preview.
+	 * Add the internal information field to the list of ignored fields for entry preview.
 	 *
 	 * @since 1.9.1
 	 *
@@ -565,7 +581,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Hide column from the entry list table.
+	 * Hide the column from the entry list table.
 	 *
 	 * @since 1.7.6
 	 *
@@ -582,7 +598,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Add CSS class for the field parent div informing about mode (editable or not).
+	 * Add a CSS class for the field parent div informing about mode (editable or not).
 	 *
 	 * @since 1.7.6
 	 *
@@ -597,6 +613,13 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 			return $css;
 		}
 
+		// If the Internal Information field is added by some add-ons, it will be hidden by default.
+		// Add styles to the addon assets to display the field.
+		// When the addon is disabled, the field is hidden.
+		if ( ! empty( $field['addon'] ) ) {
+			$css .= sprintf( ' wpforms-field-internal-information-%s-addon wpforms-hidden', $field['addon'] );
+		}
+
 		if ( $this->is_editable() ) {
 			$css .= ' internal-information-editable ';
 
@@ -609,22 +632,24 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Save checkbox state to the post meta table.
+	 * Save the checkbox state to the post meta table.
 	 *
 	 * @since 1.7.6
 	 */
-	public function save_internal_information_checkbox() {
+	public function save_internal_information_checkbox(): void {
+
+		$form_id = isset( $_POST['formId'] ) ? absint( $_POST['formId'] ) : 0;
 
 		// Run several checks: required items, security, permissions.
 		if (
-			! isset( $_POST['formId'], $_POST['name'], $_POST['checked'] ) ||
+			! $form_id ||
+			! isset( $_POST['name'], $_POST['checked'] ) ||
 			! check_ajax_referer( 'wpforms-builder', 'nonce', false ) ||
-			! wpforms_current_user_can( 'edit_forms' )
+			! wpforms_current_user_can( 'edit_forms', $form_id )
 		) {
 			wp_send_json_error();
 		}
 
-		$form_id   = (int) $_POST['formId'];
 		$checked   = (int) $_POST['checked'];
 		$name      = sanitize_text_field( wp_unslash( $_POST['name'] ) );
 		$post_meta = get_post_meta( $form_id, self::CHECKBOX_META_KEY, true );
@@ -692,7 +717,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	}
 
 	/**
-	 * Checks if user is allowed to edit the field's content.
+	 * Checks if the user is allowed to edit the field's content.
 	 *
 	 * @since 1.7.6
 	 *
@@ -755,7 +780,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	/**
 	 * Replace `[] some text` with checkboxes.
 	 *
-	 * Additionally, generates input name by hashing the line of text where the checkbox is.
+	 * Additionally, generates the input name by hashing the line of text where the checkbox is.
 	 *
 	 * @since 1.7.6
 	 *
@@ -765,7 +790,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 	 * @return string
 	 * @noinspection HtmlUnknownAttribute
 	 */
-	private function replace_checkboxes( $description, array $field ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function replace_checkboxes( $description, array $field ) {
 
 		if ( ! $this->form_id ) {
 			return $description;

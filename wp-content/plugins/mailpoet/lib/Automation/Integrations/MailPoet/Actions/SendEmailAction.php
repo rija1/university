@@ -15,18 +15,22 @@ use MailPoet\Automation\Engine\Data\StepValidationArgs;
 use MailPoet\Automation\Engine\Exceptions\NotFoundException;
 use MailPoet\Automation\Engine\Integration\Action;
 use MailPoet\Automation\Engine\Integration\ValidationException;
+use MailPoet\Automation\Engine\WordPress;
 use MailPoet\Automation\Integrations\MailPoet\Payloads\SegmentPayload;
 use MailPoet\Automation\Integrations\MailPoet\Payloads\SubscriberPayload;
 use MailPoet\Automation\Integrations\WooCommerce\Payloads\AbandonedCartPayload;
+use MailPoet\Automation\Integrations\WooCommerce\Payloads\OrderPayload;
 use MailPoet\Entities\NewsletterEntity;
 use MailPoet\Entities\NewsletterOptionEntity;
 use MailPoet\Entities\NewsletterOptionFieldEntity;
 use MailPoet\Entities\ScheduledTaskSubscriberEntity;
 use MailPoet\Entities\SubscriberEntity;
 use MailPoet\InvalidStateException;
+use MailPoet\Newsletter\NewsletterSaveController;
 use MailPoet\Newsletter\NewslettersRepository;
 use MailPoet\Newsletter\Options\NewsletterOptionFieldsRepository;
 use MailPoet\Newsletter\Options\NewsletterOptionsRepository;
+use MailPoet\Newsletter\Renderer\Blocks\DynamicProductsBlock;
 use MailPoet\Newsletter\Scheduler\AutomationEmailScheduler;
 use MailPoet\Segments\SegmentsRepository;
 use MailPoet\Settings\SettingsController;
@@ -101,6 +105,10 @@ class SendEmailAction implements Action {
 
   private NewsletterOptionFieldsRepository $newsletterOptionFieldsRepository;
 
+  private WordPress $wp;
+
+  private NewsletterSaveController $newsletterSaveController;
+
   public function __construct(
     AutomationController $automationController,
     SettingsController $settings,
@@ -110,7 +118,9 @@ class SendEmailAction implements Action {
     SegmentsRepository $segmentsRepository,
     AutomationEmailScheduler $automationEmailScheduler,
     NewsletterOptionsRepository $newsletterOptionsRepository,
-    NewsletterOptionFieldsRepository $newsletterOptionFieldsRepository
+    NewsletterOptionFieldsRepository $newsletterOptionFieldsRepository,
+    WordPress $wp,
+    NewsletterSaveController $newsletterSaveController
   ) {
     $this->automationController = $automationController;
     $this->settings = $settings;
@@ -121,6 +131,8 @@ class SendEmailAction implements Action {
     $this->automationEmailScheduler = $automationEmailScheduler;
     $this->newsletterOptionsRepository = $newsletterOptionsRepository;
     $this->newsletterOptionFieldsRepository = $newsletterOptionFieldsRepository;
+    $this->wp = $wp;
+    $this->newsletterSaveController = $newsletterSaveController;
   }
 
   public function getKey(): string {
@@ -351,7 +363,27 @@ class SendEmailAction implements Action {
       $meta[AbandonedCart::TASK_META_NAME] = $payload->getProductIds();
     }
 
-    return $meta;
+    if ($this->automationHasWooCommerceTrigger($args->getAutomation())) {
+      try {
+        // Handle Order payload - get product IDs and cross-sell IDs
+        $orderPayload = $args->getSinglePayloadByClass(OrderPayload::class);
+        $orderProductIds = $orderPayload->getProductIds();
+        $crossSellIds = $orderPayload->getCrossSellIds();
+
+        if (!empty($orderProductIds)) {
+          $meta[DynamicProductsBlock::ORDER_PRODUCTS_META_NAME] = array_unique($orderProductIds);
+        }
+
+        if (!empty($crossSellIds)) {
+          $meta[DynamicProductsBlock::ORDER_CROSS_SELL_PRODUCTS_META_NAME] = array_unique($crossSellIds);
+        }
+      } catch (NotFoundException $e) {
+        // No OrderPayload found, continue
+      }
+    }
+
+    // Allow premium features to modify meta data
+    return (array)$this->wp->applyFilters('mailpoet_automation_send_email_action_meta', $meta, $args);
   }
 
   private function getSubscriber(StepRunArgs $args): SubscriberEntity {
@@ -512,5 +544,40 @@ class SendEmailAction implements Action {
       );
     }
     return $email;
+  }
+
+  public function onDuplicate(Step $step): Step {
+    $args = $step->getArgs();
+    $emailId = (int)$args['email_id'];
+    if (!$emailId) {
+      // if the email is not yet designed, we don't need to duplicate it
+      return $step;
+    }
+
+    $email = $this->newslettersRepository->findOneBy([
+      'id' => $emailId,
+    ]);
+    if (!$email) {
+      throw new \MailPoet\Automation\Engine\Exceptions\InvalidStateException('Automation email entity not found for duplication.');
+    }
+    try {
+      $duplicatedNewsletter = $this->newsletterSaveController->duplicate($email);
+    } catch (\Throwable $e) {
+      throw new \MailPoet\Automation\Engine\Exceptions\InvalidStateException('Failed to duplicate automation email: ' . $e->getMessage());
+    }
+    $duplicatedNewsletter->setStatus($email->getStatus());
+    $this->newslettersRepository->flush();
+
+    $args['email_id'] = $duplicatedNewsletter->getId();
+    $args['subject'] = $duplicatedNewsletter->getSubject();
+
+    return new Step(
+      $step->getId(),
+      $step->getType(),
+      $step->getKey(),
+      $args,
+      $step->getNextSteps(),
+      $step->getFilters()
+    );
   }
 }

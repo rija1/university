@@ -29,7 +29,7 @@ class SmartTags {
 
 	/**
 	 * AS task action arguments.
-	 * Temporary store them to use in the filter.
+	 * Temporarily store them to use in the filter.
 	 *
 	 * @since 1.9.4
 	 *
@@ -52,10 +52,11 @@ class SmartTags {
 	 *
 	 * @since 1.6.7
 	 */
-	public function hooks() {
+	public function hooks(): void {
 
 		add_filter( 'wpforms_process_smart_tags', [ $this, 'process' ], 10, 5 );
 		add_filter( 'wpforms_builder_enqueues_smart_tags', [ $this, 'builder' ] );
+		add_filter( 'wpforms_builder_strings', [ $this, 'add_builder_strings' ], 10, 2 );
 
 		add_action(
 			'wpforms_process_entry_saved',
@@ -71,60 +72,26 @@ class SmartTags {
 	}
 
 	/**
-	 * Approved smart tags.
-	 *
-	 * @codeCoverageIgnore
-	 *
-	 * @since      1.0.0
-	 * @deprecated 1.6.7
-	 *
-	 * @param string $return Type of data to return.
-	 *
-	 * @return string|array
-	 */
-	public function get( $return = 'array' ) {
-
-		_deprecated_argument( __METHOD__, '1.6.7 of the WPForms plugin' );
-		_deprecated_function( __METHOD__, '1.6.7 of the WPForms plugin', __CLASS__ . '::get_smart_tags()' );
-
-		$tags = $this->get_smart_tags();
-
-		if ( $return !== 'list' ) {
-			return $tags;
-		}
-
-		// Return formatted list.
-		$output = '<ul class="smart-tags-list">';
-
-		foreach ( $tags as $key => $tag ) {
-			$output .= '<li><a href="#" data-value="' . esc_attr( $key ) . '">' . esc_html( $tag ) . '</a></li>';
-		}
-		$output .= '</ul>';
-
-		return $output;
-	}
-
-	/**
-	 * Get list of smart tags.
+	 * Get the list of smart tags.
 	 *
 	 * @since 1.6.7
 	 *
 	 * @return array
 	 */
-	public function get_smart_tags() {
+	public function get_smart_tags(): array {
 
 		if ( ! empty( $this->smart_tags ) ) {
 			return $this->smart_tags;
 		}
 
 		/**
-		 * Modify smart tags list.
+		 * Modify the smart tags' list.
 		 *
 		 * @since 1.4.0
 		 *
 		 * @param array $tags The list of smart tags.
 		 */
-		$this->smart_tags = (array) apply_filters(
+		$this->smart_tags = (array) apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 			'wpforms_smart_tags',
 			$this->smart_tags_list()
 		);
@@ -133,7 +100,7 @@ class SmartTags {
 	}
 
 	/**
-	 * Get list of registered smart tags.
+	 * Get the list of registered smart tags.
 	 *
 	 * @since 1.6.7
 	 *
@@ -176,6 +143,90 @@ class SmartTags {
 	}
 
 	/**
+	 * Add the Form Builder strings.
+	 *
+	 * @since 1.9.5
+	 *
+	 * @param array   $strings Localized strings.
+	 * @param WP_Post $form    Form object.
+	 *
+	 * @return array
+	 * @noinspection HtmlUnknownTarget
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function add_builder_strings( $strings, $form ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+		$strings = (array) $strings;
+
+		/**
+		 * Smart Tags.
+		 *
+		 * @since 1.6.7
+		 *
+		 * @param array $smart_tags Array of smart tags.
+		 */
+		$smart_tags = (array) apply_filters( 'wpforms_builder_enqueues_smart_tags', $this->get_smart_tags() ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+
+		$st_strings = [
+			'smart_tags_dropdown_mce_icon'          => WPFORMS_PLUGIN_URL . 'assets/images/icon-tags.svg',
+			'smart_tags'                            => $smart_tags,
+			'smart_tags_disabled_for_fields'        => [ 'entry_id' ],
+			'smart_tags_edit_ok_button'             => esc_html__( 'Apply changes', 'wpforms-lite' ),
+			'smart_tags_delete_button'              => esc_html__( 'Delete smart tag', 'wpforms-lite' ),
+			'smart_tags_edit'                       => esc_html__( 'edit', 'wpforms-lite' ),
+			'smart_tags_arg'                        => esc_html__( 'argument', 'wpforms-lite' ),
+			'smart_tags_unknown_field'              => esc_html__( 'Unknown Field', 'wpforms-lite' ),
+			'smart_tags_templates'                  => [
+				/* translators: %1$s - field ID, %2$s - field label. */
+				'field_id'       => esc_html__( 'Field %1$s', 'wpforms-lite' ),
+				/* translators: %1$s - field ID, %2$s - field label. */
+				'field_value_id' => esc_html__( 'Field value %1$s', 'wpforms-lite' ),
+				/* translators: %1$s - field ID, %2$s - field label. */
+				'field_html_id'  => esc_html__( 'Field HTML %1$s', 'wpforms-lite' ),
+				/* translators: %1$s - Query String Variable. */
+				'query_var'      => esc_html__( 'Query String Variable: %1$s', 'wpforms-lite' ),
+				/* translators: %1$s - User meta key. */
+				'user_meta'      => esc_html__( 'User Meta: %1$s', 'wpforms-lite' ),
+				/* translators: %1$s - Date format. */
+				'date'           => esc_html__( 'Date: %1$s', 'wpforms-lite' ),
+				/* translators: %1$s - Date format. */
+				'entry_date'     => esc_html__( 'Entry Date: %1$s', 'wpforms-lite' ),
+			],
+			/**
+			 * Filters the list of Smart Tags that are disabled for confirmations.
+			 *
+			 * @since 1.9.3
+			 *
+			 * @param array $disabled List of disabled Smart Tags.
+			 */
+			'smart_tags_disabled_for_confirmations' => apply_filters( 'wpforms_builder_smart_tags_disabled_for_confirmations', [] ), // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+		];
+
+		$st_strings['smart_tags_button_tooltip'] = sprintf(
+			wp_kses( /* translators: %1$s - link to the WPForms.com doc article. */
+				__( 'Easily add dynamic information from various sources with <a href="%1$s" target="_blank" rel="noopener noreferrer">Smart Tags</a>.', 'wpforms-lite' ),
+				[
+					'a' => [
+						'href'   => [],
+						'rel'    => [],
+						'target' => [],
+					],
+				]
+			),
+			esc_url(
+				wpforms_utm_link(
+					'https://wpforms.com/docs/how-to-use-smart-tags-in-wpforms/',
+					'Builder Settings',
+					'Smart Tags Documentation'
+				)
+			)
+		);
+
+		return array_merge( $strings, $st_strings );
+	}
+
+	/**
 	 * Get all smart tags in the content.
 	 *
 	 * @since 1.6.7
@@ -188,7 +239,8 @@ class SmartTags {
 
 		/**
 		 * A smart tag should start and end with a curly brace.
-		 * ([a-z0-9_]+) a smart tag name and also the first capturing group. Lowercase letters, digits, and an  underscore.
+		 * ([a-z0-9_]+) a smart tag name and also the first capturing group.
+		 * Lowercase letters, digits, and an underscore.
 		 * (|[ =][^\n}]*) - second capturing group:
 		 * | no characters at all or the following:
 		 * [ =][^\n}]* space or equal sign and any number of any characters except new line and closing curly brace.
@@ -242,7 +294,7 @@ class SmartTags {
 					true
 				)
 			) {
-				// Protect from the case where user already placed a pipe in the value.
+				// Protect from the case where the user already placed a pipe in the value.
 				$value = str_replace(
 					[ "\r\n", "\r", "\n", '|' ],
 					[ rawurlencode( '|' ), '|', '|', '|' ],
@@ -278,6 +330,7 @@ class SmartTags {
 			 * Modify a smart tag value.
 			 *
 			 * @since 1.6.7.1
+			 * @since 1.9.7.3 Added the 7th argument.
 			 *
 			 * @param scalar|null $value            Smart Tag value.
 			 * @param string      $tag_name         Smart tag name.
@@ -285,15 +338,17 @@ class SmartTags {
 			 * @param array       $fields           List of fields.
 			 * @param int         $entry_id         Entry ID.
 			 * @param SmartTag    $smart_tag_object The smart tag object or the Generic object for those cases when class unregistered.
+			 * @param string      $context          Context.
 			 */
-			$value = apply_filters(
+			$value = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 				'wpforms_smarttags_process_value',
 				$value,
 				$tag_name,
 				$form_data,
 				$fields,
 				$entry_id,
-				$smart_tag_object
+				$smart_tag_object,
+				$context
 			);
 
 			if ( $value !== null ) {
@@ -313,7 +368,7 @@ class SmartTags {
 			 * @param int      $entry_id         Entry ID.
 			 * @param SmartTag $smart_tag_object The smart tag object or the Generic object for those cases when class unregistered.
 			 */
-			$content = (string) apply_filters(
+			$content = (string) apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 				'wpforms_smart_tag_process',
 				$content,
 				$tag_name,
@@ -342,7 +397,7 @@ class SmartTags {
 	}
 
 	/**
-	 * Get smart tag class name.
+	 * Get a smart tag class name.
 	 *
 	 * @since 1.6.7
 	 *
@@ -372,7 +427,7 @@ class SmartTags {
 		 * @param string $class_name     The value.
 		 * @param string $smart_tag_name Smart tag name.
 		 */
-		$full_class_name = apply_filters( 'wpforms_smarttags_get_smart_tag_class_name', '', $smart_tag_name );
+		$full_class_name = apply_filters( 'wpforms_smarttags_get_smart_tag_class_name', '', $smart_tag_name ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 		return class_exists( $full_class_name ) ? $full_class_name : Generic::class;
 	}
@@ -449,27 +504,6 @@ class SmartTags {
 	private function replace( $tag, $value, $content ) {
 
 		return str_replace( $tag, strip_shortcodes( $value ), $content );
-	}
-
-	/**
-	 * Replace a found smart tag with the final value.
-	 *
-	 * @codeCoverageIgnore
-	 *
-	 * @since      1.5.9
-	 * @deprecated 1.6.7
-	 *
-	 * @param string $tag     The tag.
-	 * @param string $value   The value.
-	 * @param string $content Content.
-	 *
-	 * @return string
-	 */
-	public function parse( $tag, $value, $content ) {
-
-		_deprecated_function( __METHOD__, '1.6.7 of the WPForms plugin' );
-
-		return $this->replace( $tag, $value, $content );
 	}
 
 	/**

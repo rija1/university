@@ -237,7 +237,7 @@ class UsageTracking implements IntegrationInterface {
 	 *
 	 * @return string
 	 */
-	private function get_license_status(): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function get_license_status(): string {
 
 		if ( ! wpforms()->is_pro() ) {
 			return 'lite';
@@ -295,6 +295,10 @@ class UsageTracking implements IntegrationInterface {
 					'stripe-webhooks-secret-live',
 					'stripe-webhooks-id-test',
 					'stripe-webhooks-id-live',
+					'square-webhooks-id-sandbox',
+					'square-webhooks-id-live',
+					'square-webhooks-secret-sandbox',
+					'square-webhooks-secret-live',
 					'authorize_net-test-api-login-id',
 					'authorize_net-test-transaction-key',
 					'authorize_net-live-api-login-id',
@@ -903,7 +907,7 @@ class UsageTracking implements IntegrationInterface {
 	 *
 	 * @return array
 	 */
-	private function get_form_antispam_stat( array $forms ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+	private function get_form_antispam_stat( array $forms ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$stat = [
 			'antispam'           => 0,
@@ -958,7 +962,7 @@ class UsageTracking implements IntegrationInterface {
 	 *
 	 * @return int
 	 */
-	private function count_fields_with_setting( array $forms, string $field_type, string $field_setting ): int { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function count_fields_with_setting( array $forms, string $field_type, string $field_setting ): int {
 
 		$counter = 0;
 

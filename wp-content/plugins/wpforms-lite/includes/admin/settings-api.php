@@ -16,7 +16,7 @@ use WPForms\Admin\Education\Helpers as EducationHelpers;
  *
  * @return string
  */
-function wpforms_settings_output_field( array $args ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+function wpforms_settings_output_field( array $args ): string {
 
 	// Define default callback for this field type.
 	$callback = ! empty( $args['type'] ) && function_exists( 'wpforms_settings_' . $args['type'] . '_callback' ) ? 'wpforms_settings_' . $args['type'] . '_callback' : 'wpforms_settings_missing_callback';
@@ -258,7 +258,7 @@ function wpforms_settings_number_callback( array $args ): string {
  *
  * @return string
  */
-function wpforms_settings_select_callback( array $args ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+function wpforms_settings_select_callback( array $args ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 	$default     = isset( $args['default'] ) ? esc_html( $args['default'] ) : '';
 	$value       = wpforms_setting( $args['id'], $default );
@@ -457,7 +457,7 @@ function wpforms_settings_email_template_callback( array $args ): string {
  *
  * @return string
  */
-function wpforms_settings_toggle_callback( array $args ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+function wpforms_settings_toggle_callback( array $args ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 	$value      = ! empty( $args['value'] ) ? $args['value'] : wpforms_setting( $args['id'] );
 	$id         = wpforms_sanitize_key( $args['id'] );
@@ -663,17 +663,24 @@ function wpforms_settings_providers_callback( array $args ): string { // phpcs:i
  */
 function wpforms_settings_webhook_endpoint_callback( array $args ): string {
 
-	$output = '';
+	if ( empty( $args['url'] ) ) {
+		return ''; // Early return if no URL is provided.
+	}
 
-	if ( ! empty( $args['url'] ) ) {
-		$output  = '<div class="wpforms-stripe-webhook-endpoint-url">';
-		$output .= '<input type="text" disabled id="wpforms-stripe-webhook-endpoint-url" value="' . esc_url_raw( $args['url'] ) . '" />';
-		$output .= '<a class="button button-secondary wpforms-copy-to-clipboard" data-clipboard-target="#wpforms-stripe-webhook-endpoint-url" href="" ><span class="dashicons dashicons-admin-page"></span></a>';
-		$output .= '</div>';
+	$provider    = $args['provider'] ?? 'stripe';
+	$input_id    = "wpforms-{$provider}-webhook-endpoint-url";
+	$copy_btn    = '<a class="button button-secondary wpforms-copy-to-clipboard" data-clipboard-target="#' . esc_attr( $input_id ) . '" href="#" aria-label="' . esc_attr__( 'Copy webhook URL', 'wpforms-lite' ) . '"><span class="dashicons dashicons-admin-page"></span></a>';
+	$input_field = '<input type="text" disabled id="' . esc_attr( $input_id ) . '" value="' . esc_url( $args['url'] ) . '" />';
 
-		if ( ! empty( $args['desc'] ) ) {
-			$output .= '<p class="desc">' . wp_kses_post( $args['desc'] ) . '</p>';
-		}
+	$output = sprintf(
+		'<div class="%1$s">%2$s %3$s</div>',
+		esc_attr( "wpforms-{$provider}-webhook-endpoint-url" ),
+		$input_field,
+		$copy_btn
+	);
+
+	if ( ! empty( $args['desc'] ) ) {
+		$output .= sprintf( '<p class="desc">%s</p>', wp_kses_post( $args['desc'] ) );
 	}
 
 	return $output;
@@ -688,7 +695,7 @@ function wpforms_settings_webhook_endpoint_callback( array $args ): string {
  *
  * @return string
  */
-function wpforms_settings_columns_callback( array $args ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+function wpforms_settings_columns_callback( array $args ): string {
 
 	if ( empty( $args['columns'] ) || ! is_array( $args['columns'] ) ) {
 		return '';

@@ -155,6 +155,10 @@ class Functions {
     return current_user_can($capability);
   }
 
+  public function userCan($user, $capability) {
+    return user_can($user, $capability);
+  }
+
   public function dateI18n($dateformatstring, $timestampWithOffset = false, $gmt = false) {
     return date_i18n($dateformatstring, $timestampWithOffset, $gmt);
   }
@@ -634,10 +638,14 @@ class Functions {
   }
 
   public function wpRemoteGet($url, array $args = []) {
+    // We only use wp_remote_get with safe hardcoded URLs
+    // nosemgrep: tools.wpscan-semgrep-rules.audit.php.wp.security.ssrf
     return wp_remote_get($url, $args);
   }
 
   public function wpRemotePost($url, array $args = []) {
+    // We only use wp_remote_post with safe hardcoded URLs
+    // nosemgrep: tools.wpscan-semgrep-rules.audit.php.wp.security.ssrf
     return wp_remote_post($url, $args);
   }
 

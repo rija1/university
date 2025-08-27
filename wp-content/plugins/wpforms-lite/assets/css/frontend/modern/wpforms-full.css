@@ -3341,6 +3341,10 @@ div.wpforms-container-full .wpforms-form .wpforms-field-divider:first-child {
   border-top: none;
 }
 
+div.wpforms-container-full .wpforms-form .wpforms-field-divider-hide_line {
+  border-top: none;
+}
+
 div.wpforms-container-full .wpforms-form .wpforms-field-divider h3 {
   color: var(--wpforms-label-color);
   padding-top: var(--wpforms-field-size-input-spacing);
@@ -3354,6 +3358,16 @@ div.wpforms-container-full .wpforms-form .wpforms-field-divider:has(> .wpforms-f
 
 div.wpforms-container-full .wpforms-form .wpforms-field-divider + .wpforms-field-divider {
   margin-top: 45px;
+}
+
+div.wpforms-container-full .wpforms-form .wpforms-field-address .wpforms-field-row.wpforms-without-state .wpforms-field-row-block.wpforms-first {
+  width: 100%;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+div.wpforms-container-full .wpforms-form .wpforms-field-address .wpforms-field-row.wpforms-without-state .wpforms-field-row-block:not(.wpforms-first) {
+  display: none;
 }
 
 div.wpforms-container-full .wpforms-form .wpforms-field.wpforms-field-select-style-classic select {

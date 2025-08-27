@@ -4,7 +4,7 @@ namespace WPForms\Integrations\Stripe\Api\Webhooks;
 
 use RuntimeException;
 use WPForms\Integrations\Stripe\Api\PaymentIntents;
-use WPForms\Integrations\Stripe\Helpers;
+use WPForms\Integrations\Stripe\Api\Webhooks\Exceptions\AmountMismatchException;
 
 /**
  * Webhook charge.refund.updated class.
@@ -47,7 +47,7 @@ class ChargeRefundUpdated extends Base {
 
 		$db_refunded_amount = $this->get_refunded_amount();
 		$currency           = strtoupper( $this->data->object->currency );
-		$decimals_amount    = Helpers::get_decimals_amount( $currency );
+		$decimals_amount    = wpforms_get_currency_multiplier( $currency );
 
 		// We need to format amount since it doesn't contain decimals, e.g. 525 instead of 5.25.
 		$refunded_amount        = $charge->amount_refunded / $decimals_amount;
@@ -55,7 +55,7 @@ class ChargeRefundUpdated extends Base {
 
 		// Prevent duplicate webhook processing.
 		if ( ! $this->is_valid_refund_amount( $refunded_amount, $db_refunded_amount, $canceled_refund_amount ) ) {
-			throw new RuntimeException( 'Refund amount mismatch detected. Possible reasons: duplicate webhook processing or webhooks received out of order.' );
+			throw new AmountMismatchException( 'Refund amount mismatch detected. Possible reasons: duplicate webhook processing or webhooks received out of order.' );
 		}
 
 		$status = $this->is_full_refund( $canceled_refund_amount, $db_refunded_amount ) ? 'completed' : 'partrefund';

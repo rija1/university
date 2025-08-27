@@ -5,6 +5,7 @@ class Meow_MGL_Core {
 	private $gallery_process = false;
 	private $gallery_layout = 'tiles';
 	private $is_gallery_used = true; // TODO: Would be nice to detect if the gallery is actually used on the current page.
+	private $skeleton_handler;
 	
 	private static $plugin_option_name = 'mgl_options';
 	private $option_name = 'mgl_options';
@@ -22,6 +23,10 @@ class Meow_MGL_Core {
 	public function __construct() {
 		load_plugin_textdomain( MGL_DOMAIN, false, MGL_PATH . '/languages' );
 
+		// Initialize skeleton handler
+		require_once( MGL_PATH . '/classes/skeleton.php' );
+		$this->skeleton_handler = new Meow_MGL_Skeleton();
+
 		// Initializes the classes needed
 		MeowCommon_Helpers::is_rest() && new Meow_MGL_Rest( $this );
 
@@ -34,7 +39,13 @@ class Meow_MGL_Core {
 		}
 
 		// Load the Pro version *after* loading the Run class due to the JS file was gatherd into one file.
-		class_exists( 'MeowPro_MGL_Core' ) && new MeowPro_MGL_Core( $this );
+
+		$pro_module = class_exists( 'MeowPro_MGL_Core' );
+		if ( $pro_module ) {
+			new MeowPro_MGL_Core( $this );
+		} else {
+			add_shortcode( 'meow-collection', array( $this, 'collection' ) );
+		}
 
 		// Initialize the Admin if needed
 		add_action( 'init', array( $this, 'init' ) );
@@ -42,6 +53,13 @@ class Meow_MGL_Core {
 
 	function init() {
 		is_admin() && new Meow_MGL_Admin( $this );
+
+		global $wpmgl;
+		$wpmgl = $this;
+	}
+
+	function collection() {
+		return "<b>Meow Collection</b>: This is only available in the Pro version. Please <a href='https://meowapps.com/products/meow-gallery-pro/'>upgrade to Meow Gallery Pro</a> to use this feature.";
 	}
 
 	public function can_access_settings() {
@@ -133,13 +151,14 @@ class Meow_MGL_Core {
 			}
 
 			$image_ids = $shortcode['medias']['thumbnail_ids'];
+			unset( $shortcode['medias'] );
 
 			if ( isset( $shortcode['layout'] ) ) {
 				$layout = $shortcode['layout'];
+				unset( $shortcode['layout'] );
 			}
 
 			$atts = array_merge( $atts, $shortcode );
-			unset( $atts['medias'] );
 		}
 
 		if ( isset( $atts['ids'] ) ) {
@@ -218,14 +237,24 @@ class Meow_MGL_Core {
 		}
 
 		// Ordering
-		if ( isset( $atts['orderby'] ) ) {
+		if ( isset( $atts['orderby'] ) || isset( $atts['order_by'] ) ) {
+			
+			if ( isset( $atts['orderby'] ) ) {
+				$orderby = $atts['orderby'];
+				$order   = isset( $atts['order'] ) ? $atts['order'] : 'asc';
+			}
+
+			if ( isset( $atts['order_by'] ) ) {
+				$orderby = explode( '-', $atts['order_by'] )[0];
+				$order   = explode( '-', $atts['order_by'] )[1];
+			}
+
 			$image_ids = explode( ',', $image_ids );
-			$image_ids = Meow_MGL_OrderBy::run( $image_ids, $atts['orderby'], isset( $atts['order'] ) ? $atts['order'] : 'asc' );
+			$image_ids = Meow_MGL_OrderBy::run( $image_ids, $orderby, $order );
 			$image_ids = implode( ',', $image_ids );
 		}
 
 		// Layout
-		
 		if ( isset( $atts['layout'] ) && $atts['layout'] != 'default' ) {
 			$layout = $atts['layout'];
 		}
@@ -322,7 +351,13 @@ class Meow_MGL_Core {
 		
 		//The Gallery Container is where the images in the right layout will be rendered.
 		$html .= '<div class="mgl-gallery-container"></div>';
-
+		
+		// Add skeleton loading placeholder to prevent layout shift
+		$skeleton_loading = $this->get_option( 'skeleton_loading', true );
+		if ( $skeleton_loading ) {
+			$html .= $this->skeleton_handler->get_skeleton_html( $layout, $gallery_options );
+		}
+		
 		// Use the DOM to generate the images (so that lightboxes can hook into them, and for better SEO)
 		// If there are no images, the JS will look for the img_html and build the gallery from there.
 		// TODO: We should check why it's not working with the carousel (for map, it's normal).
@@ -362,7 +397,7 @@ class Meow_MGL_Core {
 		$size = isset( $atts['size'] ) ? $atts['size'] : 'large';
 		$size =  apply_filters( 'mgl_media_size', $size );
 		$custom_class = isset( $atts['custom-class'] ) ? $atts['custom-class'] : null;
-		$link = isset( $atts['link'] ) ? $atts['link'] : null;
+		$link = isset( $atts['link'] ) ? $atts['link'] : ( $options['link'] ?? null );
 		$updir = trailingslashit( $wp_upload_dir['baseurl'] );
 		$captions = isset( $atts['captions'] ) ? $atts['captions'] : ( $options['captions'] ?? 'none' );
 		$animation = null;
@@ -430,11 +465,13 @@ class Meow_MGL_Core {
 		$carousel_arrow_nav_enabled = $options['carousel_arrow_nav_enabled'];
 		$carousel_dot_nav_enabled = $options['carousel_dot_nav_enabled'];
 		$carousel_image_height = $options['carousel_image_height'];
+		$carousel_keep_aspect_ratio = $options['carousel_aspect_ratio'] ?? false;
 		if ( $layout === 'carousel' ) {
 			$carousel_gutter = $atts['gutter'] ?? $options['carousel_gutter'];
 			$carousel_arrow_nav_enabled = $atts['arrow_nav_enabled'] ?? $options['carousel_arrow_nav_enabled'];
 			$carousel_dot_nav_enabled = $atts['dot_nav_enabled'] ?? $options['carousel_dot_nav_enabled'];
 			$carousel_image_height = $atts['image_height'] ?? $options['carousel_image_height'];
+			$carousel_keep_aspect_ratio = array_key_exists( 'keep-aspect-ratio', $atts ) ? $atts['keep-aspect-ratio'] : 1;
 		}
 		// Map
 		$map_gutter = $options['map_gutter'];
@@ -478,6 +515,7 @@ class Meow_MGL_Core {
 			'carousel_arrow_nav_enabled',
 			'carousel_dot_nav_enabled',
 			'carousel_image_height',
+			'carousel_keep_aspect_ratio',
 			'map_gutter',
 			'map_height',
 		);
@@ -513,6 +551,7 @@ class Meow_MGL_Core {
 		return array(
 			'layout' => 'tiles',
 			'captions' => 'none',
+			'link' => null,
 			'captions_alignment' => 'center',
 			'captions_background' => 'fade-black',
 			'animation' => false,
@@ -553,7 +592,7 @@ class Meow_MGL_Core {
 			'maptiler_token' => '',
 			'right_click' => false,
 			'gallery_shortcode_override_disabled' => false,
-
+			'skeleton_loading' => true,
 		);
 	}
 
@@ -649,12 +688,21 @@ class Meow_MGL_Core {
 				];
 			}
 			
-			$link_attr = $this->get_link_attributes( $id, $atts['link'] ?? null, $image );
+			$default_link = $this->get_option( 'link', null );
+			$link_attr = $this->get_link_attributes( $id, $atts['link'] ?? $default_link, $image );
 			$no_lightbox = $link_attr['type'] === 'link';
 
 			$mergedArray = [
 				'id' => $id,
-				'caption' => wp_kses_post( apply_filters( 'mgl_caption', $image['caption'], $id ) ),
+				'caption' => wp_kses( 
+					html_entity_decode(apply_filters( 'mgl_caption', $image['caption'], $id ), ENT_QUOTES), 
+					[
+						'strong' => [], // Bold
+						'b' => [],      // Bold alternative
+						'em' => [],     // Italic
+						'i' => []       // Italic alternative
+					]
+				),
 				'img_html' => apply_filters( 'mgl_gallery_written', 
 					$this->get_img_html( $id, $size, $layout, $atts, $image, $no_lightbox ),
 					$layout
@@ -713,7 +761,9 @@ class Meow_MGL_Core {
 		}
 		else {
 			$info = wp_get_attachment_image_src( $id, $image_size );
-			$img_html = '<img loading="lazy" src="' . $info[0] . '" class="' . $this->get_image_class( $id, $layout, $noLightbox ) . '" />';
+			$alt_text = get_post_meta( $id, '_wp_attachment_image_alt', true );
+			
+			$img_html = '<img loading="lazy" src="' . $info[0] . '" class="' . $this->get_image_class( $id, $layout, $noLightbox ) . '" alt="' . esc_attr( $alt_text ) . '" />';
 		}
 
 		if ( $layout === 'masonry' ) {
@@ -815,7 +865,8 @@ class Meow_MGL_Core {
 		$map_images = array_map( function ( $id ) use ( $images, $atts ) {
 
 			$image = $images[$id];
-			$link_attr = $this->get_link_attributes( $id, $atts['link'] ?? null, $image );
+			$default_link = $this->get_option( 'link', null );
+			$link_attr = $this->get_link_attributes( $id, $atts['link'] ?? $default_link, $image );
 
 			$geo_coordinates = MeowPro_MGL_Exif::get_gps_data( $id, $image['meta'] );
 			if ( empty( $geo_coordinates ) ) {
@@ -831,6 +882,7 @@ class Meow_MGL_Core {
 				[
 					'id' => $id,
 					'file' => $image['meta']['file'],
+					'file_full' => wp_get_attachment_url( $id ),
 					'file_srcset' => wp_get_attachment_image_srcset( $id, 'full' ),
 					'file_sizes' => wp_get_attachment_image_sizes( $id, 'full' ),
 					'dimension' => [
@@ -858,24 +910,33 @@ class Meow_MGL_Core {
 		return esc_attr( htmlspecialchars( wp_json_encode( $data ), ENT_QUOTES, 'UTF-8' ) );
 	}
 
-	public function generate_uniqid( $length = 13 ) {
-		if ( function_exists( "random_bytes" ) ) {
-			$bytes = random_bytes( ceil( $length / 2 ) );
-		}
-		elseif ( function_exists( "openssl_random_pseudo_bytes" ) ) {
-			$bytes = openssl_random_pseudo_bytes( ceil( $length / 2 ) );
-		}
+	public function generate_uniqid($length = 13) {
+		// Use WordPress function
+		if ( function_exists( 'wp_unique_id' ) ) {
+			$prefix = uniqid();
+			return wp_unique_id( $prefix );
+		} 
+		// Fall back 
 		else {
-			throw new Exception( "No cryptographically secure random function available." );
+			if ( function_exists( "random_bytes" ) ) {
+				$bytes = random_bytes( ceil( $length / 2 ) );
+			}
+			elseif ( function_exists( "openssl_random_pseudo_bytes" ) ) {
+				$bytes = openssl_random_pseudo_bytes(ceil($length / 2));
+			}
+			else {
+				throw new Exception( "No cryptographically secure random function available." );
+			}
+			return substr( bin2hex( $bytes ), 0, $length );
 		}
-		return substr( bin2hex( $bytes ), 0, $length );
 	}
 
 
 	public function get_gallery_by_id( $id ) {
 		global $wpdb;
 		$shortcodes_table = $wpdb->prefix . 'mgl_gallery_shortcodes';
-		$gallery = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $shortcodes_table WHERE id = %d", $id ), ARRAY_A );
+		$gallery = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $shortcodes_table WHERE id = %s", $id ), ARRAY_A );
+
 		if ( !$gallery ) {
 			throw new Exception( __( 'Gallery not found.', MGL_DOMAIN ));
 		}
@@ -898,6 +959,8 @@ class Meow_MGL_Core {
 				'description' => $gallery['description'],
 				'layout' => $gallery['layout'],
 				'medias' => maybe_unserialize( $gallery['medias'] ),
+				'lead_image_id' => $gallery['lead_image_id'],
+				'order_by' => $gallery['order_by'],
 				'is_post_mode' => ( bool )$gallery['is_post_mode'],
 				'hero' => ( bool )$gallery['is_hero_mode'],
 				'posts' => $gallery['posts'] ? maybe_unserialize( $gallery['posts'] ) : null,
@@ -908,7 +971,7 @@ class Meow_MGL_Core {
 		return $galleries;
 	}
 
-	public function get_galleries( $offset = 0, $limit = 10, $order = 'DESC' ) {
+	public function get_galleries( $offset = 0, $limit = 10, $order = 'DESC', $page = 1 ) {
 		global $wpdb;
 		$shortcodes_table = $wpdb->prefix . 'mgl_gallery_shortcodes';
 		
@@ -923,6 +986,10 @@ class Meow_MGL_Core {
 		// Use the new table
 		// Get total count
 		$total = $wpdb->get_var( "SELECT COUNT( * ) FROM $shortcodes_table" );
+		// Calculate offset based on page if provided
+		if ($page > 1 && $offset === 0) {
+			$offset = ($page - 1) * $limit;
+		}
 		
 		// Get shortcodes with pagination and sorting
 		$query = $wpdb->prepare(
@@ -940,6 +1007,8 @@ class Meow_MGL_Core {
 				'description' => $gallery['description'],
 				'layout' => $gallery['layout'],
 				'medias' => maybe_unserialize( $gallery['medias'] ),
+				'lead_image_id' => $gallery['lead_image_id'],
+				'order_by' => $gallery['order_by'],
 				'is_post_mode' => ( bool )$gallery['is_post_mode'],
 				'hero' => ( bool )$gallery['is_hero_mode'],
 				'posts' => $gallery['posts'] ? maybe_unserialize( $gallery['posts'] ) : null,
@@ -981,6 +1050,8 @@ class Meow_MGL_Core {
 					'description' => $gallery['description'],
 					'layout' => $gallery['layout'],
 					'medias' => unserialize( $gallery['medias'] ),
+					'lead_image_id' => $gallery['lead_image_id'],
+					'order_by' => $gallery['order_by'],
 					'is_post_mode' => ( bool )$gallery['is_post_mode'],
 					'hero' => ( bool )$gallery['is_hero_mode'],
 					'posts' => $gallery['posts'] ? unserialize( $gallery['posts'] ) : null,
@@ -996,7 +1067,7 @@ class Meow_MGL_Core {
 		return $collection;
 	}
 
-	public function get_collections( $offset = 0, $limit = 10, $order = 'DESC' ) {
+	public function get_collections( $offset = 0, $limit = 10, $order = 'DESC', $page = 1 ) {
 		global $wpdb;
 		$collections_table = $wpdb->prefix . 'mgl_collections';
 		$shortcodes_table = $wpdb->prefix . 'mgl_gallery_shortcodes';
@@ -1011,6 +1082,10 @@ class Meow_MGL_Core {
 		
 		// Get total count
 		$total = $wpdb->get_var( "SELECT COUNT( * ) FROM $collections_table" );
+		// Calculate offset based on page if provided
+		if ($page > 1 && $offset === 0) {
+			$offset = ($page - 1) * $limit;
+		}
 		
 		// Get collections with pagination and sorting
 		$query = $wpdb->prepare(
@@ -1040,6 +1115,8 @@ class Meow_MGL_Core {
 						'description' => $gallery['description'],
 						'layout' => $gallery['layout'],
 						'medias' => unserialize( $gallery['medias'] ),
+						'lead_image_id' => $gallery['lead_image_id'],
+						'order_by' => $gallery['order_by'],
 						'is_post_mode' => ( bool )$gallery['is_post_mode'],
 						'hero' => ( bool )$gallery['is_hero_mode'],
 						'posts' => $gallery['posts'] ? unserialize( $gallery['posts'] ) : null,
@@ -1066,6 +1143,7 @@ class Meow_MGL_Core {
 			'collections' => $result
 		];
 	}
+
 }
 
 ?>

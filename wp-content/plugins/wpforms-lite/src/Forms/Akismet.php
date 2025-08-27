@@ -157,7 +157,7 @@ class Akismet {
 	 *
 	 * @return bool
 	 */
-	private function entry_is_spam( array $form_data, array $entry ): bool { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function entry_is_spam( array $form_data, array $entry ): bool {
 
 		$request = $this->get_request_args( $form_data, $entry );
 
@@ -237,7 +237,7 @@ class Akismet {
 	 *
 	 * @return array $request_args Request arguments to be sent to Akismet.
 	 */
-	private function get_request_args( $form_data, $entry ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function get_request_args( $form_data, $entry ) {
 
 		$entry_data = $this->get_entry_data( $form_data['fields'], $entry );
 
@@ -246,10 +246,10 @@ class Akismet {
 		// We can't use certain real-time functions when the entry is marked as not spam.
 		// In this case, we need to use the smart tag value.
 		if ( ! empty( $entry_id ) ) {
-			$page_url    = wpforms_process_smart_tags( '{page_url}', $form_data, [], $entry_id );
-			$url_referer = wpforms_process_smart_tags( '{url_referer}', $form_data, [], $entry_id );
-			$user_id     = wpforms_process_smart_tags( '{user_id}', $form_data, [], $entry_id );
-			$user_ip     = wpforms_process_smart_tags( '{user_ip}', $form_data, [], $entry_id );
+			$page_url    = wpforms_process_smart_tags( '{page_url}', $form_data, [], $entry_id, 'akismet-request-args' );
+			$url_referer = wpforms_process_smart_tags( '{url_referer}', $form_data, [], $entry_id, 'akismet-request-args' );
+			$user_id     = wpforms_process_smart_tags( '{user_id}', $form_data, [], $entry_id, 'akismet-request-args' );
+			$user_ip     = wpforms_process_smart_tags( '{user_ip}', $form_data, [], $entry_id, 'akismet-request-args' );
 			$user_agent  = '';
 		} else {
 			$page_url    = wpforms_current_url();
