@@ -288,33 +288,6 @@ header nav.wp-block-navigation .wp-block-navigation__container > li:nth-child(5)
   position: relative;
 }
 
-.home_cta h2 {
-  text-align: center;
-}
-
-.home_cta h2::before {
-  font-family: "FontAwesome";
-  font-size: 38px;
-  content: "";
-  padding-right: 30px;
-}
-
-.home_cta_1 h2::before {
-  content: "\f19c";
-}
-
-.home_cta_2 h2::before {
-  content: "\f19d";
-}
-
-.home_cta_3 h2::before {
-  content: "\f655";
-}
-
-.home_cta_4 h2::before {
-  content: "\f1ce";
-}
-
 .wp-block-post-title a {
   display: inline;
   position: relative;
